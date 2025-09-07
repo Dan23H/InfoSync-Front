@@ -1,34 +1,19 @@
-import {
-  Box,
-  Typography,
-  Button,
-  Modal,
-  TextField,
-  RadioGroup,
-  Radio,
-  FormControlLabel,
-} from "@mui/material";
-import type { CourseDto } from "../../../../models/types"; // usamos el modelo real del API
+import { Box, Typography, Button, Modal, TextField, RadioGroup, Radio, FormControlLabel } from "@mui/material";
+import type { ModalFormProps } from "../../../../models/types";
 
-interface ModalFormProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  temp: CourseDto | null;
-  setTemp: React.Dispatch<React.SetStateAction<CourseDto | null>>;
-  title: string;
-  subtitle?: string;
-}
+export default function ModalForm({ open, onClose, onConfirm, temp, setTemp, title, subtitle }: ModalFormProps) {
+  const handleNameChange = (value: string) => {
+    setTemp((prev) =>
+      prev ? { ...prev, name: value } : { name: value, type: "B" }
+    );
+  };
 
-export default function ModalForm({
-  open,
-  onClose,
-  onConfirm,
-  temp,
-  setTemp,
-  title,
-  subtitle,
-}: ModalFormProps) {
+  const handleTypeChange = (value: "B" | "E") => {
+    setTemp((prev) =>
+      prev ? { ...prev, type: value } : { name: "", type: value }
+    );
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -53,17 +38,13 @@ export default function ModalForm({
 
         <TextField
           label="Nombre"
-          value={temp?.name || ""}
-          onChange={(e) =>
-            setTemp((prev) => (prev ? { ...prev, name: e.target.value } : null))
-          }
+          value={temp?.name ?? ""}
+          onChange={(e) => handleNameChange(e.target.value)}
         />
 
         <RadioGroup
-          value={temp?.type || ""}
-          onChange={(e) =>
-            setTemp((prev) => (prev ? { ...prev, type: e.target.value as "B" | "E" } : null))
-          }
+          value={temp?.type ?? "B"}
+          onChange={(e) => handleTypeChange(e.target.value as "B" | "E")}
         >
           <FormControlLabel value="B" control={<Radio />} label="Básica" />
           <FormControlLabel value="E" control={<Radio />} label="Electiva" />
@@ -71,7 +52,11 @@ export default function ModalForm({
 
         <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
           <Button onClick={onClose}>Cancelar</Button>
-          <Button variant="contained" onClick={onConfirm}>
+          <Button
+            variant="contained"
+            onClick={onConfirm}
+            disabled={!temp?.name?.trim()}
+          >
             Confirmar
           </Button>
         </Box>

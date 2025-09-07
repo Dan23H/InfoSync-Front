@@ -4,6 +4,8 @@ import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
 import StudentMain from "./pages/StudentMain";
+import PostsPage from "./pages/PostListPage";
+import PostPage from "./pages/PostPage";
 
 export default function AppRouter() {
     return (
@@ -12,7 +14,7 @@ export default function AppRouter() {
                 <Route path="/" element="" />
                 {/* Rutas Administrador */}
                 <Route
-                    path="/main"
+                    path="/admin"
                     element={
                         <ThemeProvider theme={adminTheme}>
                             <TabsProvider>
@@ -29,6 +31,8 @@ export default function AppRouter() {
                         <StudentMain />
                     }
                 />
+                <Route path="/student/:plan/:course" element={<PostsPage />} />
+                <Route path="/student/:plan/:course/:post" element={<PostPage />} />
             </Routes>
         </BrowserRouter>
     );

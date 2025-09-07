@@ -1,18 +1,12 @@
 import { Button, ButtonGroup, Grid } from "@mui/material";
-
-interface Props {
-    semestre: number; // cantidad de botones de semestre a mostrar
-    setSemestre: (n: number) => void;
-    seleccion: number; // cuál botón está seleccionado
-    setSeleccion: (n: number) => void;
-}
+import type { SelectorProps } from "../../../../models/types";
 
 export default function Selector({
     semestre,
     setSemestre,
     seleccion,
     setSeleccion,
-}: Props) {
+}: SelectorProps) {
     const handleRemove = () => {
         if (semestre > 1) {
             setSemestre(semestre - 1);

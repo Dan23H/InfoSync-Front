@@ -1,4 +1,4 @@
-import type { CourseDto, CourseType, CreatePensumDto, Pensum, UpdatePensumDto } from "../models/types";
+import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto } from "../models/types";
 
 const BASE_URL = "/api"; // TEMPORAL BORRAR EN CUANTO FUNCIONE Y REEMPLAZARLO POR VARIABLE DE ENTORNO
 
@@ -28,12 +28,12 @@ export const getPensumById = (id: string) =>
     method: "GET",
   });
 
-export const createPensum = (data: CreatePensumDto) => request<Pensum>(`${BASE_URL}/pensum`, {
+export const createPensum = (data: PensumDto) => request<Pensum>(`${BASE_URL}/pensum`, {
   method: "POST",
   body: JSON.stringify(data),
 });
 
-export const updatePensum = (id: string, data: UpdatePensumDto) =>
+export const updatePensum = (id: string, data: PensumDto) =>
   request<Pensum>(`${BASE_URL}/pensum/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
@@ -44,7 +44,7 @@ export const deletePensum = (id: string) =>
     method: "DELETE",
   });
 
-// Cursos dentro de semestres CRUD
+// Asignaturas CRUD
 export const addCourse = (id: string, data: { semesterNumber: number; courseName: string; courseType: CourseType }) =>
   request<Pensum>(`${BASE_URL}/pensum/${id}/course`, {
     method: "POST",
@@ -69,5 +69,33 @@ export const updateCourse = (id: string, semesterNumber: number, courseName: str
 
 export const deleteCourse = (id: string, semesterNumber: number, courseName: string) =>
   request<void>(`${BASE_URL}/pensum/${id}/semester/${semesterNumber}/course/${courseName}`, {
+    method: "DELETE",
+  });
+
+  // Publicaciones CRUD
+export const getPosts = () =>
+  request<Post[]>(`${BASE_URL}/post`, {
+    method: "GET",
+  });
+
+export const getPostById = (id: string) =>
+  request<Post>(`${BASE_URL}/post/${id}`, {
+    method: "GET",
+  });
+
+export const createPost = (data: PostDto) =>
+  request<Post>(`${BASE_URL}/post`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updatePost = (id: string, data: Partial<PostDto>) =>
+  request<Post>(`${BASE_URL}/post/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deletePost = (id: string) =>
+  request<void>(`${BASE_URL}/post/${id}`, {
     method: "DELETE",
   });
