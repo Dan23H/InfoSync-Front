@@ -83,11 +83,15 @@ export const getPostById = (id: string) =>
     method: "GET",
   });
 
-export const createPost = (data: PostDto) =>
-  request<Post>(`${BASE_URL}/post`, {
+export const createPost = (data: PostDto) =>{
+  const url = `${BASE_URL}/post`;
+  console.log("createPost URL:", url);
+  console.log("Payload:", data);
+
+  return request<Post>(url, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+  })} 
 
 export const updatePost = (id: string, data: Partial<PostDto>) =>
   request<Post>(`${BASE_URL}/post/${id}`, {

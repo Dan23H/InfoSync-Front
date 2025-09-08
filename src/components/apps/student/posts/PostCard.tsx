@@ -1,6 +1,10 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar } from "@mui/material";
 import { useState } from "react";
 import type { Post } from "../../../../models/types";
+import { Link } from "react-router-dom";
+import { slugify } from "../../../../utils/slugify";
+import AddBookmarkSVG from "../../../../assets/AddBookmarkSVG.svg";
+import BookmarkSVG from "../../../../assets/BookmarkSVG.svg";
 
 interface PostCardProps {
   post: Post;
@@ -11,6 +15,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
 
   const open = Boolean(anchorEl);
 
@@ -20,10 +25,14 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     Date.now() - new Date(post.createdAt).getTime() < 2 * 60 * 60 * 1000;
 
   return (
-    <Card sx={{ mb: 2, backgroundColor: "#e0e0e0" }}>
-      <CardContent>
+    <Card sx={{ mb: 2, backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: 2, boxShadow: 1, }}>
+      <CardContent
+        component={Link}
+        to={`/student/${post.pensumId}/${slugify(post.course)}/${post._id}`}
+        sx={{ textDecoration: "none", color: "inherit" }}
+      >
         {/* Encabezado */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, ml: 2, mr: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Avatar sx={{ width: 24, height: 24, bgcolor: "brown" }} />
             <Typography variant="body2" fontWeight="bold">
@@ -34,30 +43,40 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             </Typography>
           </Box>
 
+          {/* Menú de opciones */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Chip
               label={post.type === "Q" ? "Pregunta" : "Sugerencia"}
               size="small"
-              color={post.type === "Q" ? "default" : "primary"}
+              sx={{ bgcolor: post.type === "Q" ? "#787777" : "#006387", color: "#fff" }}
             />
-            <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-              {"MoreVertIcon"}
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setAnchorEl(e.currentTarget);
+              }}
+            >
+              {"OptionsIcon"}
             </IconButton>
             <Menu
               anchorEl={anchorEl}
               open={open}
               onClose={() => setAnchorEl(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             >
-              {canEdit && <MenuItem>Editar</MenuItem>}
-              <MenuItem>Eliminar</MenuItem>
-              <MenuItem>Reportar</MenuItem>
+              {canEdit && <MenuItem onClick={() => console.log("Editar")}>Editar</MenuItem>}
+              <MenuItem onClick={() => console.log("Reportar")}>Reportar</MenuItem>
             </Menu>
           </Box>
         </Box>
 
-        {/* Contenido */}
-        <Typography variant="h6">{post.title}</Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>
+        {/* Contenido del post */}
+        <Typography variant="h6" sx={{ ml: 2, mr: 2, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{post.title}</Typography>
+        <Typography variant="body2" sx={{ mt: 1, ml: 2, mr: 2, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>
           {post.description}
         </Typography>
       </CardContent>
@@ -69,36 +88,42 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           <Typography variant="body2" sx={{ cursor: "pointer" }}>
             Compartir
           </Typography>
-          {post.type === "S" && (   
+          {post.type === "S" && (
             <Typography variant="body2" color="primary">
               Recomendado
             </Typography>
           )}
         </Box>
 
-        {post.type === "S" && (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton
-              onClick={() => {
-                setLiked(!liked);
-                if (disliked) setDisliked(false);
-              }}
-            >
-              {liked ? "FavoriteIconSelected" : "FavoriteIconUnselected"}
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                setDisliked(!disliked);
-                if (liked) setLiked(false);
-              }}
-            >
-              {"FavoriteIconSelected" /* ícono rotado */}
-            </IconButton>
-            <IconButton>
-              {"BookmarkIcon"}
-            </IconButton>
-          </Box>
-        )}
+        <Box sx={{ display: "flex", gap: 1 }}>
+          {post.type === "S" && (
+            <>
+              <IconButton
+                onClick={() => {
+                  setLiked(!liked);
+                  if (disliked) setDisliked(false);
+                }}
+              >
+                {liked ? "FavoriteIconSelected" : "FavoriteIconUnselected"}
+              </IconButton>
+              <IconButton
+                onClick={() => {
+                  setDisliked(!disliked);
+                  if (liked) setLiked(false);
+                }}
+              >
+                {disliked ? "DislikeIconSelected" : "DislikeIconUnselected"}
+              </IconButton>
+            </>
+          )}
+          <IconButton
+            onClick={() => {
+              setBookmarked(!bookmarked);
+            }}
+          >
+            {bookmarked ? <img src={BookmarkSVG} alt="editar" width={20} height={20} /> : <img src={AddBookmarkSVG} alt="editar" width={20} height={20} style={{ filter: "grayscale(100%)" }} />}
+          </IconButton>
+        </Box>
       </CardActions>
     </Card>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getPensums, createPensum, updatePensum, deletePensum } from "../api/pensum";
-import type { CreatePensumDto, Pensum, UpdatePensumDto } from "../models/types";
+import { getPensums, createPensum, updatePensum, deletePensum, getPensumById } from "../api/pensum";
+import type { PensumDto, Pensum } from "../models/types";
 
 
 export function usePensums() {
@@ -21,7 +21,16 @@ export function usePensums() {
     }
   };
 
-  const addPensum = async (dto: CreatePensumDto) => {
+  const fetchPensumById = async (id: string) => {
+    try {
+      return await getPensumById(id);
+    } catch (e: any) {
+      setError(e.message);
+      return null;
+    }
+  };
+
+  const addPensum = async (dto: PensumDto) => {
     try {
       const result = await createPensum(dto);
       setData((prev) => [...prev, result]);
@@ -30,7 +39,7 @@ export function usePensums() {
     }
   };
 
-  const editPensum = async (id: string, dto: UpdatePensumDto) => {
+  const editPensum = async (id: string, dto: PensumDto) => {
     try {
       const result = await updatePensum(id, dto);
       setData((prev) => prev.map((p) => (p._id === id ? result : p)));
@@ -52,5 +61,5 @@ export function usePensums() {
     fetchPensums();
   }, []);
 
-  return { data, loading, error, fetchPensums, addPensum, editPensum, removePensum };
+  return { data, loading, error, fetchPensums, fetchPensumById, addPensum, editPensum, removePensum };
 }

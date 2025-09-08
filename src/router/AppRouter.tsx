@@ -4,8 +4,8 @@ import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
 import StudentMain from "./pages/StudentMain";
-import PostsPage from "./pages/PostListPage";
 import PostPage from "./pages/PostPage";
+import PostsListPage from "./pages/PostsListPage";
 
 export default function AppRouter() {
     return (
@@ -31,8 +31,10 @@ export default function AppRouter() {
                         <StudentMain />
                     }
                 />
-                <Route path="/student/:plan/:course" element={<PostsPage />} />
+                <Route path="/student/:plan/:course" element={<PostsListPage />} />
                 <Route path="/student/:plan/:course/:post" element={<PostPage />} />
+                <Route path="*" element={<h1>404 - Not Found</h1>} />
+                
             </Routes>
         </BrowserRouter>
     );

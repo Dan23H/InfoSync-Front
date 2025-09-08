@@ -92,11 +92,11 @@ export interface Post {
 
 export interface PostDto {
   userId: string;
-  type: string;
+  type: "Q" | "R";
   title: string;
   subject: string;
-  course: string;
   description: string;
+  course: string;
   images?: string[];
   files?: string[];
 }

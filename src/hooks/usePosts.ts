@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getPosts } from "../api/pensum";
-import type { Post } from "../models/types";
+import { getPosts, createPost } from "../api/pensum";
+import type { Post, PostDto } from "../models/types";
 import { slugify } from "../utils/slugify";
 
 export function usePosts(plan?: string, course?: string) {
@@ -8,33 +8,55 @@ export function usePosts(plan?: string, course?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        setLoading(true);
-        const posts = await getPosts();
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const posts = await getPosts();
 
-        let filtered = posts;
+      let filtered = posts;
 
-        if (plan) {
-          filtered = filtered.filter((p) => p.pensumId === plan);
-        }
-
-        if (course) {
-          filtered = filtered.filter(
-            (p) => slugify(p.course) === course
-          );
-        }
-
-        setData(filtered);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (plan) {
+        filtered = filtered.filter((p) => p.pensumId === plan);
       }
+
+      if (course) {
+        filtered = filtered.filter(
+          (p) => slugify(p.course) === course
+        );
+      }
+
+      setData(filtered);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const addPost = async (dto: PostDto, pensumId: string) => {
+    try {
+      const payload = {
+        userId: "64f8a1234567890abcdef123", // temporal hasta implementar perfiles
+        pensumId,
+        type: dto.type ?? "Q",
+        title: dto.title,
+        subject: dto.subject,
+        description: dto.description,
+        course: dto.course,
+        images: dto.images ?? ["nada"],
+        files: dto.files ?? ["nada"],
+      };
+
+      const newPost = await createPost(payload);
+      setData((prev) => [newPost, ...prev]);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
     fetchPosts();
   }, [plan, course]);
 
-  return { data, loading, error };
+  return { data, loading, error, addPost, fetchPosts };
 }

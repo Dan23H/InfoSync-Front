@@ -15,15 +15,20 @@ export default function PostList({ posts, course }: PostListProps) {
   const questions = posts.filter((p) => p.type === "Q");
   const suggestions = posts.filter((p) => p.type === "S");
 
-  return (
-    <Grid>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        {course}
-      </Typography>
+  const openedCount = [showQuestions, showSuggestions].filter(Boolean).length;
+  const gridSize = openedCount === 2 ? 6 : 12;
 
-      <Grid>
-        {/* Preguntas */}
-        <Card sx={{ mb: 2 }} >
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12 }}>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          {course}
+        </Typography>
+      </Grid>
+
+      {/* Preguntas */}
+      <Grid size={{ xs: 12, md: gridSize }}>
+        <Card sx={{ mb: 2 }}>
           <CardHeader
             title="Preguntas"
             onClick={() => setShowQuestions((prev) => !prev)}
@@ -46,9 +51,9 @@ export default function PostList({ posts, course }: PostListProps) {
         </Card>
       </Grid>
 
-      <Grid>
-        {/* Sugerencias */}
-        <Card >
+      {/* Sugerencias */}
+      <Grid size={{ xs: 12, md: gridSize }}>
+        <Card sx={{ mb: 2 }}>
           <CardHeader
             title="Sugerencias"
             onClick={() => setShowSuggestions((prev) => !prev)}
