@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
 import { useEffect, useState } from "react";
@@ -16,6 +16,8 @@ export default function PostsListPage() {
   const [pensum, setPensum] = useState<any>(null);
   const [pensumLoading, setPensumLoading] = useState(true);
   const [pensumError, setPensumError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!plan) return;
@@ -38,6 +40,15 @@ export default function PostsListPage() {
 
   return (
     <>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={() => navigate(`/student`)}
+        sx={{ mb: 2 }}
+      >
+        Volver
+      </Button>
+
       <Button
         variant="contained"
         color="primary"

@@ -1,11 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AdminMain from "./pages/AdminMain"
 import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
-import StudentMain from "./pages/StudentMain";
-import PostPage from "./pages/PostPage";
-import PostsListPage from "./pages/PostsListPage";
+import { AdminMainPage, PostPage, PostsListPage, StudentMainPage } from "./pages";
+
 
 export default function AppRouter() {
     return (
@@ -18,7 +16,7 @@ export default function AppRouter() {
                     element={
                         <ThemeProvider theme={adminTheme}>
                             <TabsProvider>
-                                <AdminMain />
+                                <AdminMainPage />
                             </TabsProvider>
                         </ThemeProvider>
                     }
@@ -28,7 +26,7 @@ export default function AppRouter() {
                 <Route
                     path="/student"
                     element={
-                        <StudentMain />
+                        <StudentMainPage />
                     }
                 />
                 <Route path="/student/:plan/:course" element={<PostsListPage />} />

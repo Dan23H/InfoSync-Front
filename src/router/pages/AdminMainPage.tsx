@@ -6,7 +6,7 @@ import ColorTabs from '../../components/apps/admin/ColorTabs';
 import Stats from '../../components/apps/admin/stats/Stats';
 import Modding from '../../components/apps/admin/moderation/Modding';
 
-export default function AdminMain() {
+export default function AdminMainPage() {
   const { value } = useTabs();
   return (
     <Box>
