@@ -259,7 +259,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
       />
 
       <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-        <Button variant="outlined" color="inherit">
+        <Button variant="outlined" color="inherit" onClick={onClose}>
           Cancelar
         </Button>
         <Button variant="contained" onClick={handleSubmitPlan}>

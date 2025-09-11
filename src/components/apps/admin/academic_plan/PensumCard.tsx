@@ -42,7 +42,7 @@ const PensumCard: React.FC<PensumCardProps> = ({ pensum, onEdit, onDelete }) => 
           <Grid container spacing={2} alignItems="stretch">
 
             {pensum.semesters.map((semester) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl:2 }} key={semester.semesterNumber}>
+              <Grid size={{ xs: 12, sm: 12, md: 6, lg: 3, xl:2}} key={semester.semesterNumber}>
                 <Box sx={{ border: "1px solid #ddd", borderRadius: 1, p: 2, height: "95%", boxShadow:1 }}>
                   <Typography variant="h6" sx={{ mt: 1 }} gutterBottom>
                     Semestre {semester.semesterNumber}

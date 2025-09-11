@@ -1,4 +1,4 @@
-import { Select, MenuItem, FormControl, InputLabel, Box, Typography, TextField, Paper, List, ListItemButton } from "@mui/material";
+import { Select, MenuItem, FormControl, InputLabel, Box, Typography, TextField, Paper, List, ListItemButton, Grid, Divider } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { usePensums } from "../../../hooks/usePensums";
 import { useDeselect } from "../../../hooks/useDeselect";
@@ -50,19 +50,25 @@ export default function Main() {
     );
 
   const sugerencias = [
-  ...new Set(
-    data
-      .filter((p) => p._id === planSeleccionado)
-      .flatMap((p) =>
-        p.semesters.flatMap((s) => s.courses.map((c) => c.name))
-      )
-      .filter((name) =>
-        asignaturaSeleccionada
-          ? name.toLowerCase().includes(asignaturaSeleccionada.toLowerCase())
-          : false
-      )
-  ),
-].slice(0, 10);
+    ...new Set(
+      data
+        .filter((p) => p._id === planSeleccionado)
+        .flatMap((p) =>
+          p.semesters.flatMap((s) => s.courses.map((c) => c.name))
+        )
+        .filter((name) =>
+          asignaturaSeleccionada
+            ? name.toLowerCase().includes(asignaturaSeleccionada.toLowerCase())
+            : false
+        )
+    ),
+  ].slice(0, 10);
+
+  const cursosPorSemestre = asignaturasFiltradas.reduce((acc: any, curso: any) => {
+    if (!acc[curso.semesterNumber]) acc[curso.semesterNumber] = [];
+    acc[curso.semesterNumber].push(curso);
+    return acc;
+  }, {});
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -82,96 +88,115 @@ export default function Main() {
             ))}
           </Select>
         </FormControl>
-
-        {/* Filtro de semestre */}
-        <FormControl fullWidth>
-          <InputLabel>Semestre</InputLabel>
-          <Select
-            value={semestreSeleccionado}
-            label="Semestre"
-            onChange={(e) => setSemestreSeleccionado(e.target.value)}
-          >
-            <MenuItem value="">Todos los semestres</MenuItem>
-            {[...new Set(
-              data
-                .find((p) => p._id === planSeleccionado)
-                ?.semesters.map((s) => s.semesterNumber) ?? []
-            )]
-              .sort()
-              .map((s) => (
-                <MenuItem key={s} value={s}>
-                  {s}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
       </Box>
-
-      {/* Campo de texto con sugerencias */}
-      <Box sx={{ position: "relative" }} ref={wrapperRef}>
-        <TextField
-          label="Asignatura"
-          value={asignaturaSeleccionada}
-          onChange={(e) => {
-            setAsignaturaSeleccionada(e.target.value);
-            setMostrarSugerencias(true);
-          }}
-          onFocus={() => setMostrarSugerencias(true)}
-          fullWidth
-        />
-        {mostrarSugerencias && sugerencias.length > 0 && (
-          <Paper
-            sx={{
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              right: 0,
-              zIndex: 10,
-              maxHeight: 200,
-              overflowY: "auto",
-            }}
-          >
-            <List>
-              {sugerencias.map((s, i) => (
-                <ListItemButton
-                  sx={{ fontSize: 16 }}
-                  key={i}
-                  onClick={() => {
-                    setAsignaturaSeleccionada(s);
-                    setMostrarSugerencias(false);
-                  }}
-                >
-                  {s}
-                </ListItemButton>
-              ))}
-            </List>
-          </Paper>
-        )}
-      </Box>
-
+      <Grid container spacing={2} alignItems="center">
+        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+          <Typography variant="h6" align={"center"}>
+            Filtros opcionales:
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+          {/* Filtro de semestre */}
+          <FormControl fullWidth>
+            <InputLabel>Semestre</InputLabel>
+            <Select
+              value={semestreSeleccionado}
+              label="Semestre"
+              onChange={(e) => setSemestreSeleccionado(e.target.value)}
+            >
+              <MenuItem value="">Todos los semestres</MenuItem>
+              {[...new Set(
+                data
+                  .find((p) => p._id === planSeleccionado)
+                  ?.semesters.map((s) => s.semesterNumber) ?? []
+              )]
+                .sort()
+                .map((s) => (
+                  <MenuItem key={s} value={s}>
+                    {s}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+          {/* Campo de texto con sugerencias */}
+          <Box sx={{ position: "relative" }} ref={wrapperRef}>
+            <TextField
+              label="Asignatura"
+              value={asignaturaSeleccionada}
+              onChange={(e) => {
+                setAsignaturaSeleccionada(e.target.value);
+                setMostrarSugerencias(true);
+              }}
+              onFocus={() => setMostrarSugerencias(true)}
+              fullWidth
+            />
+            {mostrarSugerencias && sugerencias.length > 0 && (
+              <Paper
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  zIndex: 10,
+                  maxHeight: 200,
+                  overflowY: "auto",
+                }}
+              >
+                <List>
+                  {sugerencias.map((s, i) => (
+                    <ListItemButton
+                      sx={{ fontSize: 16 }}
+                      key={i}
+                      onClick={() => {
+                        setAsignaturaSeleccionada(s);
+                        setMostrarSugerencias(false);
+                      }}
+                    >
+                      {s}
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Paper>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
       {/* Lista de asignaturas */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: 2,
-        }}
-      >
-        {asignaturasFiltradas.map((c, i) => (
-          <CourseCard
-            key={i}
-            name={c.name}
-            semesterNumber={c.semesterNumber}
-            planId={c.planId}
-            planName={c.planName}
-            type={c.type}
-            onClick={() =>
-              navigate(
-                `/student/${encodeURIComponent(c.planId)}/${slugify(c.name)}`
-              )
-            }
-          />
-        ))}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {Object.keys(cursosPorSemestre)
+          .sort((a, b) => Number(a) - Number(b)) // ordenar semestres
+          .map((semestre) => (
+            <Box key={semestre}>
+              <Divider sx={{ mb: 2 }}>
+                <Typography variant="h6">Semestre {semestre}</Typography>
+              </Divider>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+                  gap: 2,
+                }}
+              >
+                {cursosPorSemestre[semestre].map((c: any, i: number) => (
+                  <CourseCard
+                    key={i}
+                    name={c.name}
+                    semesterNumber={c.semesterNumber}
+                    planId={c.planId}
+                    planName={c.planName}
+                    type={c.type}
+                    onClick={() =>
+                      navigate(
+                        `/student/${encodeURIComponent(c.planId)}/${slugify(c.name)}`
+                      )
+                    }
+                  />
+                ))}
+              </Box>
+            </Box>
+          ))}
       </Box>
     </Box>
   );
