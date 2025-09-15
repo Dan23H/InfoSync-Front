@@ -1,6 +1,6 @@
 import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto } from "../models/types";
 
-const BASE_URL = "/api"; // TEMPORAL BORRAR EN CUANTO FUNCIONE Y REEMPLAZARLO POR VARIABLE DE ENTORNO
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
