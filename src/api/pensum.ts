@@ -3,15 +3,22 @@ import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto } from "..
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const headers: HeadersInit = {};
+
+  if (options?.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-    },
     ...options,
+    headers: {
+      ...headers,
+      ...(options?.headers || {}),
+    },
   });
 
   if (!res.ok) {
-    throw new Error(`Error ${res.status}: ${res.statusText}`);
+    throw new Error(`Error ${res.status}: ${await res.text()}`);
   }
 
   return res.json();
@@ -72,7 +79,7 @@ export const deleteCourse = (id: string, semesterNumber: number, courseName: str
     method: "DELETE",
   });
 
-  // Publicaciones CRUD
+// Publicaciones CRUD
 export const getPosts = () =>
   request<Post[]>(`${BASE_URL}/post`, {
     method: "GET",
@@ -83,15 +90,36 @@ export const getPostById = (id: string) =>
     method: "GET",
   });
 
-export const createPost = (data: PostDto) =>{
+export const createPost = (data: PostDto & { pensumId: string }) => {
   const url = `${BASE_URL}/post`;
   console.log("createPost URL:", url);
-  console.log("Payload:", data);
+
+  const formData = new FormData();
+  formData.append("userId", data.userId);
+  formData.append("pensumId", data.pensumId);
+  formData.append("type", data.type ?? "Q");
+  formData.append("title", data.title);
+  formData.append("subject", data.subject);
+  formData.append("description", data.description);
+  formData.append("course", data.course);
+
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((img) => {
+      formData.append("images", img);
+    });
+  }
+
+  if (data.files && data.files.length > 0) {
+    data.files.forEach((file) => {
+      formData.append("files", file);
+    });
+  }
 
   return request<Post>(url, {
     method: "POST",
-    body: JSON.stringify(data),
-  })} 
+    body: formData,
+  });
+};
 
 export const updatePost = (id: string, data: Partial<PostDto>) =>
   request<Post>(`${BASE_URL}/post/${id}`, {

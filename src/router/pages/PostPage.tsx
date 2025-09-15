@@ -122,8 +122,8 @@ export default function PostPage() {
                     alt={`img-${i}`}
                     onClick={() => handleOpen(i)}
                     sx={{
-                      width: 150,
-                      height: 100,
+                      width: 200,
+                      height: 200,
                       objectFit: "cover",
                       cursor: "pointer",
                       borderRadius: 1,
@@ -134,8 +134,8 @@ export default function PostPage() {
                   <Box
                     onClick={() => handleOpen(2)}
                     sx={{
-                      width: 150,
-                      height: 100,
+                      width: 200,
+                      height: 200,
                       bgcolor: "grey.300",
                       display: "flex",
                       justifyContent: "center",

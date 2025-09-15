@@ -34,25 +34,18 @@ export function usePosts(plan?: string, course?: string) {
   };
 
   const addPost = async (dto: PostDto, pensumId: string) => {
-    try {
-      const payload = {
-        userId: "64f8a1234567890abcdef123", // temporal hasta implementar perfiles
-        pensumId,
-        type: dto.type ?? "Q",
-        title: dto.title,
-        subject: dto.subject,
-        description: dto.description,
-        course: dto.course,
-        images: dto.images ?? [],
-        files: dto.files ?? [],
-      };
+  try {
+    const newPost = await createPost({
+      ...dto,
+      pensumId,
+      userId: "64f8a1234567890abcdef123", // temporal
+    });
+    setData((prev) => [newPost, ...prev]);
+  } catch (err: any) {
+    setError(err.message);
+  }
+};
 
-      const newPost = await createPost(payload);
-      setData((prev) => [newPost, ...prev]);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
 
   useEffect(() => {
     fetchPosts();
