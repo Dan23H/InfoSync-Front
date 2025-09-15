@@ -1,5 +1,18 @@
 import { useParams, Link } from "react-router-dom";
-import { Box, Typography, Avatar, Card, CardContent, Modal, IconButton, List, ListItem, ListItemText, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Card,
+  CardContent,
+  Modal,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Grid,
+} from "@mui/material";
 import { usePosts } from "../../hooks/usePosts";
 import { useState } from "react";
 
@@ -40,13 +53,43 @@ export default function PostPage() {
     );
   };
 
-  // 🔹 Filtrar publicaciones de la misma asignatura (excepto la actual)
-  const relatedPosts = posts.filter((p) => p._id !== postId);
-
   return (
-    <Box sx={{ display: "flex", gap: 3 }}>
-      {/* Contenido principal */}
-      <Box sx={{ flex: 3 }}>
+    <Grid container spacing={2}>
+      {/* Sidebar de publicaciones */}
+      <Grid size={{ xs: 12, md: 3 }}>
+        <Card sx={{ height: "100%", overflowY: "auto" }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Publicaciones de {course}
+            </Typography>
+            <Divider />
+            <List>
+              {posts.map((p) => (
+                <ListItem
+                  key={p._id}
+                  component={Link}
+                  to={`/student/${plan}/${course}/${p._id}`}
+                  sx={{
+                    textDecoration: "none",
+                    bgcolor: p._id === postId ? "grey.200" : "transparent",
+                    borderRadius: 1,
+                    mb: 0.5,
+                    "&:hover": { bgcolor: "grey.100" },
+                  }}
+                >
+                  <ListItemText
+                    primary={p.title}
+                    secondary={new Date(p.createdAt).toLocaleDateString()}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Contenido principal del post */}
+      <Grid size={{ xs: 12, md: 9 }}>
         <Card sx={{ backgroundColor: "#e0e0e0", p: 2 }}>
           <CardContent>
             {/* Header */}
@@ -149,30 +192,7 @@ export default function PostPage() {
             )}
           </CardContent>
         </Card>
-      </Box>
-
-      {/* Lista lateral */}
-      <Box sx={{ flex: 1, maxHeight: "80vh", overflowY: "auto" }}>
-        <Typography variant="h6" gutterBottom>
-          Más publicaciones de {course}
-        </Typography>
-        <List>
-          {relatedPosts.map((p) => (
-            <Box key={p._id}>
-              <ListItem
-                component={Link}
-                to={`/student/${plan}/${course}/${p._id}`}
-              >
-                <ListItemText
-                  primary={p.title}
-                  secondary={new Date(p.createdAt).toLocaleDateString()}
-                />
-              </ListItem>
-              <Divider />
-            </Box>
-          ))}
-        </List>
-      </Box>
+      </Grid>
 
       {/* Modal de imágenes */}
       <Modal open={open} onClose={handleClose}>
@@ -235,6 +255,6 @@ export default function PostPage() {
           )}
         </Box>
       </Modal>
-    </Box>
+    </Grid>
   );
 }
