@@ -2,14 +2,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
-import { AdminMainPage, PostPage, PostsListPage, StudentMainPage } from "./pages";
+import { AdminMainPage, PostPage, PostsListPage, StudentMainPage, RouterPage } from "./pages";
 
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element="" />
+                <Route path="/" element={<RouterPage />} />
                 {/* Rutas Administrador */}
                 <Route
                     path="/admin"
