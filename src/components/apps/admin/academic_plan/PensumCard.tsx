@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardContent, IconButton, Typography, List, ListItem, ListItemText, Collapse, Grid, Box } from "@mui/material";
 import type { PensumCardProps } from "../../../../models/types";
-import EditSVG from "../../../../assets/EditSVG.svg";
-import DeleteSVG from "../../../../assets/DeleteSVG.svg";
+import { DeleteSVG, EditSVG } from "../../../../assets";
 
 const PensumCard: React.FC<PensumCardProps> = ({ pensum, onEdit, onDelete }) => {
   const [expanded, setExpanded] = useState(false);

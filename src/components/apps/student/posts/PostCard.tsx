@@ -3,8 +3,8 @@ import { useState } from "react";
 import type { Post } from "../../../../models/types";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
-import AddBookmarkSVG from "../../../../assets/AddBookmarkSVG.svg";
-import BookmarkSVG from "../../../../assets/BookmarkSVG.svg";
+import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSelected, LikeUnselected } from "../../../../assets";
+
 
 interface PostCardProps {
   post: Post;
@@ -104,7 +104,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   if (disliked) setDisliked(false);
                 }}
               >
-                {liked ? "FavoriteIconSelected" : "FavoriteIconUnselected"}
+                {liked ? <img src={LikeSelected} alt="like" width={22} height={22} /> : <img src={LikeUnselected} alt="like" width={22} height={22} />}
               </IconButton>
               <IconButton
                 onClick={() => {
@@ -112,7 +112,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   if (liked) setLiked(false);
                 }}
               >
-                {disliked ? "DislikeIconSelected" : "DislikeIconUnselected"}
+                {disliked ? <img src={DislikeSelected} alt="dislike" width={22} height={22} /> : <img src={DislikeUnselected} alt="dislike" width={22} height={22} />}
               </IconButton>
             </>
           )}
@@ -121,7 +121,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               setBookmarked(!bookmarked);
             }}
           >
-            {bookmarked ? <img src={BookmarkSVG} alt="editar" width={20} height={20} /> : <img src={AddBookmarkSVG} alt="editar" width={20} height={20} style={{ filter: "grayscale(100%)" }} />}
+            {bookmarked ? <img src={BookmarkSVG} alt="bookmark" width={20} height={20} /> : <img src={AddBookmarkSVG} alt="bookmark" width={20} height={20} style={{ filter: "grayscale(100%)" }} />}
           </IconButton>
         </Box>
       </CardActions>

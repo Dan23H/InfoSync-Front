@@ -1,0 +1,28 @@
+<svg width="1100" height="1100" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <desc>Created with Fabric.js 5.2.4</desc>
+  <ellipse stroke="#000000" ry="247.61904" rx="259.99999" id="svg_39" cy="397.28567" cx="332.77773" stroke-width="50" fill="#ffffff"/>
+  <ellipse stroke="#000000" ry="247.61904" rx="259.99999" id="svg_40" cy="392.5079" cx="770.33326" stroke-width="50" fill="#ffffff"/>
+  <rect transform="rotate(-45 465.746 664.661)" stroke="#000000" stroke-width="50" id="svg_44" height="551.57724" width="316.73638" y="388.87208" x="307.37799" fill="none"/>
+  <rect transform="rotate(45 637.52 664.276)" stroke="#000000" stroke-width="50" id="svg_46" height="561.10701" width="310.40187" y="383.72219" x="482.31904" fill="none"/>
+  <rect transform="rotate(-45 514.286 580.357)" stroke="null" id="svg_6" height="554.61998" width="455.28829" y="303.04715" x="286.64161" stroke-width="5" fill="#ffffff"/>
+  <rect transform="rotate(-45 591.124 578.106)" stroke="#ffffff" id="svg_9" height="445.04038" width="563.03795" y="355.58534" x="309.60455" stroke-width="5" fill="#ffffff"/>
+  <ellipse transform="rotate(-45 388.183 444.973)" stroke="#ffffff" ry="275.55064" rx="209.30443" id="svg_10" cy="444.97324" cx="388.18313" stroke-width="50" fill="#ffffff"/>
+  <ellipse transform="rotate(45 709.805 440.625)" stroke="#ffffff" ry="275.55064" rx="205.48224" id="svg_11" cy="440.62541" cx="709.80476" stroke-width="50" fill="#ffffff"/>
+  <line transform="rotate(90 551.13 325.178)" stroke="#000000" id="svg_14" y2="355.65054" x2="581.60208" y1="294.70614" x1="520.65768" stroke-width="50" fill="none"/>
+  <path id="svg_33" d="m538.35493,932.21153" transform="rotate(90 538.355 932.211)" opacity="undefined" stroke-width="30" stroke="#000000" fill="none"/>
+  <line transform="rotate(90 551.13 384.702)" stroke="#000000" id="svg_35" y2="415.17436" x2="581.60208" y1="354.22996" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 444.226)" stroke="#000000" id="svg_36" y2="474.69817" x2="581.60208" y1="413.75377" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 503.75)" stroke="#000000" id="svg_37" y2="534.22199" x2="581.60208" y1="473.27759" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 563.274)" stroke="#000000" id="svg_38" y2="593.7458" x2="581.60208" y1="532.80141" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 622.798)" stroke="#000000" id="svg_41" y2="653.26962" x2="581.60208" y1="592.32522" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 682.322)" stroke="#000000" id="svg_42" y2="712.79344" x2="581.60208" y1="651.84904" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 741.846)" stroke="#000000" id="svg_43" y2="772.31725" x2="581.60208" y1="711.37285" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 801.37)" stroke="#000000" id="svg_45" y2="831.84107" x2="581.60208" y1="770.89667" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 860.894)" stroke="#000000" id="svg_47" y2="891.36489" x2="581.60208" y1="830.42049" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 920.418)" stroke="#000000" id="svg_48" y2="950.8887" x2="581.60208" y1="889.9443" x1="520.65768" stroke-width="50" fill="none"/>
+  <line transform="rotate(90 551.13 265.654)" stroke="#000000" id="svg_49" y2="296.12672" x2="581.60208" y1="235.18233" x1="520.65768" stroke-width="50" fill="none"/>
+ </g>
+
+</svg>

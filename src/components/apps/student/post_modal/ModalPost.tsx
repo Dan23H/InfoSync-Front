@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography } from "@mui/material";
 
 interface ModalPostProps {
     open: boolean;
@@ -28,7 +28,10 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
 
     const handleFileChange = (field: "images" | "files", files: FileList | null) => {
         if (files) {
-            handleChange(field, Array.from(files));
+            setForm((prev) => ({
+                ...prev,
+                [field]: [...prev[field], ...Array.from(files)],
+            }));
         }
     };
 
@@ -49,9 +52,9 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     }, [open, initialData]);
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: "100%" }} >
             <DialogTitle>Subir publicación</DialogTitle>
-            <DialogContent dividers>
+            <DialogContent dividers sx={{ maxHeight: "60vh", overflowY: "auto" }}>
                 <Grid container spacing={2}>
                     {/* Título y Asignatura */}
                     <Grid size={{ xs: 6 }}>
@@ -102,17 +105,20 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
 
                     {/* Descripción */}
                     <Grid size={{ xs: 12 }}>
-                        <TextField
-                            fullWidth
-                            label="Descripción"
-                            multiline
-                            minRows={4}
-                            value={form.description}
-                            onChange={(e) => handleChange("description", e.target.value)}
-                        />
+                        <Box sx={{ maxHeight: 150, overflowY: "auto", p:1 }}>
+                            <TextField
+                                fullWidth
+                                label="Descripción"
+                                multiline={true}
+                                minRows={4}
+                                value={form.description}
+                                onChange={(e) => handleChange("description", e.target.value)}
+                            />
+                        </Box>
                     </Grid>
 
-                    {/* Imágenes y Archivos */}
+
+                    {/* Imágenes */}
                     <Grid size={{ xs: 6 }}>
                         <Button variant="outlined" component="label" fullWidth>
                             Subir Imágenes
@@ -124,7 +130,8 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                 onChange={(e) => handleFileChange("images", e.target.files)}
                             />
                         </Button>
-                        <Box sx={{ mt: 1 }}>
+                        <Box sx={{ mt: 1, maxHeight: 120, overflowY: "auto" }}>
+                            {form.images? <Typography variant="subtitle2">Subiendo {form.images.length} imágenes:</Typography> : null}
                             {form.images.map((file, index) => (
                                 <Box
                                     key={index}
@@ -138,7 +145,12 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                         borderRadius: "4px",
                                     }}
                                 >
-                                    <span style={{ fontSize: "0.85rem" }}>{file.name}</span>
+                                    <Typography style={{ fontSize: "0.85rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
+                                        {file.name}
+                                    </Typography>
+                                    <Typography style={{ fontSize: "0.75rem", color: "gray", alignItems:"right" }}>
+                                        {file.size < 1000000 ? `${(file.size / 1024).toFixed(2)} KB` : `${(file.size / 1024 / 1024).toFixed(2)} MB` }
+                                    </Typography>
                                     <Button
                                         size="small"
                                         color="error"
@@ -149,13 +161,14 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                             }))
                                         }
                                     >
-                                        X
+                                        x
                                     </Button>
                                 </Box>
                             ))}
                         </Box>
                     </Grid>
 
+                    {/* Archivos */}
                     <Grid size={{ xs: 6 }}>
                         <Button variant="outlined" component="label" fullWidth>
                             Subir Archivos
@@ -166,7 +179,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                 onChange={(e) => handleFileChange("files", e.target.files)}
                             />
                         </Button>
-                        <Box sx={{ mt: 1 }}>
+                        <Box sx={{ mt: 1, maxHeight: 120, overflowY: "auto" }}>
                             {form.files.map((file, index) => (
                                 <Box
                                     key={index}
@@ -180,7 +193,9 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                         borderRadius: "4px",
                                     }}
                                 >
-                                    <span style={{ fontSize: "0.85rem" }}>{file.name}</span>
+                                    <span style={{ fontSize: "0.85rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
+                                        {file.name}
+                                    </span>
                                     <Button
                                         size="small"
                                         color="error"
@@ -191,13 +206,12 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                             }))
                                         }
                                     >
-                                        X
+                                        x
                                     </Button>
                                 </Box>
                             ))}
                         </Box>
                     </Grid>
-
                 </Grid>
             </DialogContent>
             <DialogActions>

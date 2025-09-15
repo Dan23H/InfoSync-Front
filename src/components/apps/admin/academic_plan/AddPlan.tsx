@@ -246,7 +246,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
         </Grid>
       </Grid>
 
-      {/* Courses del semestre seleccionado */}
+      {/* Cursos del semestre seleccionado */}
       <CustomTextbox
         planName={plan.name}
         semestre={semestreActual}
