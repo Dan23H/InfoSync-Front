@@ -1,5 +1,5 @@
-import { useParams } from "react-router-dom";
-import { Box, Typography, Avatar, Card, CardContent, Modal, IconButton, } from "@mui/material";
+import { useParams, Link } from "react-router-dom";
+import { Box, Typography, Avatar, Card, CardContent, Modal, IconButton, List, ListItem, ListItemText, Divider } from "@mui/material";
 import { usePosts } from "../../hooks/usePosts";
 import { useState } from "react";
 
@@ -40,110 +40,139 @@ export default function PostPage() {
     );
   };
 
+  // 🔹 Filtrar publicaciones de la misma asignatura (excepto la actual)
+  const relatedPosts = posts.filter((p) => p._id !== postId);
+
   return (
-    <>
-      <Card sx={{ backgroundColor: "#e0e0e0", p: 2 }}>
-        <CardContent>
-          {/* Header */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Avatar sx={{ bgcolor: "brown", mr: 1 }} />
-            <Typography variant="body2" fontWeight="bold">
-              {post.userId}
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 1 }}>
-              {new Date(post.createdAt).toLocaleDateString()}
-            </Typography>
-          </Box>
-
-          {/* Título y descripción */}
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            {post.title}
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {post.description}
-          </Typography>
-
-          {/* Imágenes */}
-          {post.images && post.images.length > 0 && (
-            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-              {post.images.slice(0, 2).map((img, i) => (
-                <Box
-                  key={i}
-                  component="img"
-                  src={img}
-                  alt={`img-${i}`}
-                  onClick={() => handleOpen(i)}
-                  sx={{
-                    width: 150,
-                    height: 100,
-                    objectFit: "cover",
-                    cursor: "pointer",
-                    borderRadius: 1,
-                  }}
-                />
-              ))}
-              {post.images.length > 2 && (
-                <Box
-                  onClick={() => handleOpen(2)}
-                  sx={{
-                    width: 150,
-                    height: 100,
-                    bgcolor: "grey.300",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  +{post.images.length - 2}
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {/* Archivos */}
-          {post.files && post.files.length > 0 && (
-            <>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Documentos Adjuntos
+    <Box sx={{ display: "flex", gap: 3 }}>
+      {/* Contenido principal */}
+      <Box sx={{ flex: 3 }}>
+        <Card sx={{ backgroundColor: "#e0e0e0", p: 2 }}>
+          <CardContent>
+            {/* Header */}
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <Avatar sx={{ bgcolor: "brown", mr: 1 }} />
+              <Typography variant="body2" fontWeight="bold">
+                {post.userId}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-                {post.files.slice(0, 5).map((file, i) => (
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                {new Date(post.createdAt).toLocaleDateString()}
+              </Typography>
+            </Box>
+
+            {/* Título y descripción */}
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              {post.title}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {post.description}
+            </Typography>
+
+            {/* Imágenes */}
+            {post.images && post.images.length > 0 && (
+              <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                {post.images.slice(0, 2).map((img, i) => (
                   <Box
                     key={i}
+                    component="img"
+                    src={img}
+                    alt={`img-${i}`}
+                    onClick={() => handleOpen(i)}
                     sx={{
-                      width: 80,
-                      height: 80,
-                      bgcolor: "grey.200",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      width: 150,
+                      height: 100,
+                      objectFit: "cover",
+                      cursor: "pointer",
+                      borderRadius: 1,
                     }}
-                  >
-                    {file.endsWith(".pdf") ? "PDF" : "File"}
-                  </Box>
+                  />
                 ))}
-                {post.files.length > 5 && (
+                {post.images.length > 2 && (
                   <Box
+                    onClick={() => handleOpen(2)}
                     sx={{
-                      width: 80,
-                      height: 80,
+                      width: 150,
+                      height: 100,
                       bgcolor: "grey.300",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                       fontWeight: "bold",
+                      cursor: "pointer",
                     }}
                   >
-                    +{post.files.length - 5}
+                    +{post.images.length - 2}
                   </Box>
                 )}
               </Box>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            )}
+
+            {/* Archivos */}
+            {post.files && post.files.length > 0 && (
+              <>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Documentos Adjuntos
+                </Typography>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
+                  {post.files.slice(0, 5).map((file, i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        bgcolor: "grey.200",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {file.endsWith(".pdf") ? "PDF" : "File"}
+                    </Box>
+                  ))}
+                  {post.files.length > 5 && (
+                    <Box
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        bgcolor: "grey.300",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      +{post.files.length - 5}
+                    </Box>
+                  )}
+                </Box>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+
+      {/* Lista lateral */}
+      <Box sx={{ flex: 1, maxHeight: "80vh", overflowY: "auto" }}>
+        <Typography variant="h6" gutterBottom>
+          Más publicaciones de {course}
+        </Typography>
+        <List>
+          {relatedPosts.map((p) => (
+            <Box key={p._id}>
+              <ListItem
+                component={Link}
+                to={`/student/${plan}/${course}/${p._id}`}
+              >
+                <ListItemText
+                  primary={p.title}
+                  secondary={new Date(p.createdAt).toLocaleDateString()}
+                />
+              </ListItem>
+              <Divider />
+            </Box>
+          ))}
+        </List>
+      </Box>
 
       {/* Modal de imágenes */}
       <Modal open={open} onClose={handleClose}>
@@ -206,6 +235,6 @@ export default function PostPage() {
           )}
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 }

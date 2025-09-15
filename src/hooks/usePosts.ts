@@ -43,8 +43,8 @@ export function usePosts(plan?: string, course?: string) {
         subject: dto.subject,
         description: dto.description,
         course: dto.course,
-        images: dto.images ?? ["nada"],
-        files: dto.files ?? ["nada"],
+        images: dto.images ?? [],
+        files: dto.files ?? [],
       };
 
       const newPost = await createPost(payload);
