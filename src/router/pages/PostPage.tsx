@@ -1,18 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Avatar,
-  Card,
-  CardContent,
-  Modal,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Grid,
-} from "@mui/material";
+import { Box, Typography, Avatar, Card, CardContent, Modal, IconButton, List, ListItem, Divider, Grid } from "@mui/material";
 import { usePosts } from "../../hooks/usePosts";
 import { useState } from "react";
 
@@ -27,6 +14,8 @@ export default function PostPage() {
 
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [visited, setVisited] = useState<string[]>([]);
+
 
   if (loading) return <Typography>Cargando post...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -53,36 +42,73 @@ export default function PostPage() {
     );
   };
 
+  const handlePostClick = (postId: string) => {
+    setVisited((prev) => [...new Set([...prev, postId])]); // marcar como visitado
+  };
+
+
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ height: "100vh", overflowY: "hidden" }}>
       {/* Sidebar de publicaciones */}
-      <Grid size={{ xs: 12, md: 3 }}>
+      <Grid size={{ xs: 12, md: 3 }} sx={{ height: "100%" }}>
+        <Typography variant="h6" gutterBottom position={"sticky"} align="center">
+          Publicaciones de {course}
+        </Typography>
+        <Divider />
         <Card sx={{ height: "100%", overflowY: "auto" }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Publicaciones de {course}
-            </Typography>
-            <Divider />
             <List>
-              {posts.map((p) => (
-                <ListItem
-                  key={p._id}
-                  component={Link}
-                  to={`/student/${plan}/${course}/${p._id}`}
-                  sx={{
-                    textDecoration: "none",
-                    bgcolor: p._id === postId ? "grey.200" : "transparent",
-                    borderRadius: 1,
-                    mb: 0.5,
-                    "&:hover": { bgcolor: "grey.100" },
-                  }}
-                >
-                  <ListItemText
-                    primary={p.title}
-                    secondary={new Date(p.createdAt).toLocaleDateString()}
-                  />
-                </ListItem>
-              ))}
+              {posts
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // ordenar por fecha
+                .map((p) => (
+                  <ListItem
+                    key={p._id}
+                    alignItems="flex-start"
+                    onClick={() => handlePostClick(p._id)}
+                    component={Link}
+                    to={`/student/${plan}/${course}/${p._id}`}
+                    sx={{
+                      textDecoration: "none",
+                      bgcolor: p._id === postId ? "grey.200" : "transparent",
+                      borderRadius: 1,
+                      mb: 1,
+                      "&:hover": { bgcolor: "grey.100" },
+                      color: visited.includes(p._id) ? "text.secondary" : "text.primary",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+                      <Avatar sx={{ width: 15, height: 15, mr: 1 }} />
+                      <Typography variant="body2" fontWeight="bold">
+                        {p.userId}
+                      </Typography>
+                      <Typography variant="body2" sx={{ ml: 1 }}>
+                        {new Date(p.createdAt).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {p.title}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {p.description}
+                    </Typography>
+
+                    <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5 }}>
+                      <Typography variant="caption">
+                        {0} comentarios
+                      </Typography>
+                      {p.type === "S" && (
+                        <Typography variant="caption" color="success.main">
+                          Recomendado
+                        </Typography>
+                      )}
+                    </Box>
+                  </ListItem>
+                ))}
+
             </List>
           </CardContent>
         </Card>
@@ -114,7 +140,7 @@ export default function PostPage() {
             {/* Imágenes */}
             {post.images && post.images.length > 0 && (
               <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                {post.images.slice(0, 2).map((img, i) => (
+                {post.images.slice(0, 3).map((img, i) => (
                   <Box
                     key={i}
                     component="img"
@@ -136,12 +162,14 @@ export default function PostPage() {
                     sx={{
                       width: 200,
                       height: 200,
-                      bgcolor: "grey.300",
+                      bgcolor: "grey.500",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                       fontWeight: "bold",
                       cursor: "pointer",
+                      border: 1,
+                      borderRadius: 1,
                     }}
                   >
                     +{post.images.length - 2}
