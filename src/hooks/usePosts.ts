@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPosts, createPost } from "../api/pensum";
-import type { Post, PostDto } from "../models/types";
+import type { Post, PostDto } from "../models";
 import { slugify } from "../utils/slugify";
 
 export function usePosts(plan?: string, course?: string) {

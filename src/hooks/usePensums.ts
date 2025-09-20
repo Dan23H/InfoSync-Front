@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPensums, createPensum, updatePensum, deletePensum, getPensumById } from "../api/pensum";
-import type { PensumDto, Pensum } from "../models/types";
+import type { PensumDto, Pensum } from "../models";
 
 
 export function usePensums() {
