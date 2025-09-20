@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import ModalForm from "./ModalForm";
-import type { CustomTextbox, CourseDto } from "../../../../models/types";
+import type { CustomTextbox, CourseDto } from "../../../../models";
 
 export default function CustomTextbox({ planName, semestre, asignaturas, onAdd, onDelete, onUpdate, }: CustomTextbox) {
   const [modalState, setModalState] = useState<{

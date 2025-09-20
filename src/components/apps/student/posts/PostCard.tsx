@@ -1,6 +1,6 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar } from "@mui/material";
 import { useState } from "react";
-import type { Post } from "../../../../models/types";
+import type { Post } from "../../../../models";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
 import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSelected, LikeUnselected } from "../../../../assets";
@@ -56,8 +56,9 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 e.preventDefault();
                 setAnchorEl(e.currentTarget);
               }}
+              
             >
-              {"OptionsIcon"}
+              {"⋮⋮⋮"}
             </IconButton>
             <Menu
               anchorEl={anchorEl}

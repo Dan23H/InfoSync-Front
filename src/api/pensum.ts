@@ -1,4 +1,4 @@
-import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto } from "../models/types";
+import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto, Comment } from "../models";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -129,5 +129,36 @@ export const updatePost = (id: string, data: Partial<PostDto>) =>
 
 export const deletePost = (id: string) =>
   request<void>(`${BASE_URL}/post/${id}`, {
+    method: "DELETE",
+  });
+
+// Comentarios
+export const getComments = (postId: string) =>
+  request<Comment[]>(`${BASE_URL}/comment?postId=${postId}`, { method: "GET" });
+
+export const createComment = (data: { userId: string; postId: string; commentary: string }) =>
+  request<Comment>(`${BASE_URL}/comment`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateComment = (id: string, data: { commentary: string }) =>
+  request<Comment>(`${BASE_URL}/comment/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deleteComment = (id: string) =>
+  request<void>(`${BASE_URL}/comment/${id}`, { method: "DELETE" });
+
+// Subcomentarios
+export const createSubComment = (commentId: string, data: { userId: string; commentary: string }) =>
+  request<Comment>(`${BASE_URL}/comment/${commentId}/subcomment`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const deleteSubComment = (commentId: string, subCommentId: string) =>
+  request<void>(`${BASE_URL}/comment/${commentId}/subcomment/${subCommentId}`, {
     method: "DELETE",
   });

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Button, Typography, TextField, Select, MenuItem, FormControl, InputLabel, Grid } from "@mui/material";
 import CustomTextbox from "./CustomTextbox";
 import Selector from "./Selector";
-import type { Pensum, CourseDto } from "../../../../models/types";
+import type { Pensum, CourseDto } from "../../../../models";
 import { createPensum } from "../../../../api/pensum";
 import { usePensums } from "../../../../hooks/usePensums";
 

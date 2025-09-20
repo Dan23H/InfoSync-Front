@@ -1,5 +1,5 @@
 import { Box, Card, CardActionArea, CardContent, Typography } from "@mui/material";
-import type { CourseCardProps } from "../../../../models/types";
+import type { CourseCardProps } from "../../../../models";
 
 export default function CourseCard({ name, semesterNumber, planName, type, onClick }: CourseCardProps) {
   return (

@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Grid } from "@mui/material";
-import type { SelectorProps } from "../../../../models/types";
+import type { SelectorProps } from "../../../../models";
 
 export default function Selector({
     semestre,

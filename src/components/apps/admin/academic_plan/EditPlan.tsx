@@ -3,7 +3,7 @@ import { Box, Button, Typography, TextField, Grid } from "@mui/material";
 import Selector from "./Selector";
 import CustomTextbox from "./CustomTextbox";
 
-import type { Pensum, CourseDto } from "../../../../models/types";
+import type { Pensum, CourseDto } from "../../../../models";
 import { getPensumById, updatePensum } from "../../../../api/pensum";
 
 interface EditPlanProps {

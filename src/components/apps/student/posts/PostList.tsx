@@ -1,7 +1,7 @@
 import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid } from "@mui/material";
 import { useState } from "react";
 import PostCard from "./PostCard";
-import type { Post } from "../../../../models/types";
+import type { Post } from "../../../../models";
 
 interface PostListProps {
   posts: Post[];

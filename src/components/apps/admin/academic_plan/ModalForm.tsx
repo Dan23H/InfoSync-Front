@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Modal, TextField, RadioGroup, Radio, FormControlLabel } from "@mui/material";
-import type { ModalFormProps } from "../../../../models/types";
+import type { ModalFormProps } from "../../../../models";
 import { useState } from "react";
 
 export default function ModalForm({ open, onClose, onConfirm, temp, setTemp, title, subtitle }: ModalFormProps) {
