@@ -2,20 +2,25 @@ import { useNavigate, useParams } from "react-router-dom";
 import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
 import { useEffect, useState } from "react";
-import { Button, Typography } from "@mui/material";
-import { slugify } from "../../utils/slugify";
-import PostList from "../../components/apps/student/posts/PostList";
-import ModalPost from "../../components/apps/student/post_modal/ModalPost";
+import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid, Fab } from "@mui/material";
+import PostCard from "../../components/apps/student/posts/PostCard";
+import { usePlan } from "../../context/PlanContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function PostsListPage() {
-  const { plan, course } = useParams<{ plan: string; course: string }>();
-  const { data: posts, loading: postsLoading, error: postsError, addPost } = usePosts(plan, course);
-  const { fetchPensumById } = usePensums();
+  const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
+  const { planId } = usePlan();
+  const { user } = useAuth();
+  const plan = planId ?? planFromUrl;
 
-  const [open, setOpen] = useState(false);
+  const { data: posts, loading: postsLoading, error: postsError } = usePosts(plan, course);
+  const { fetchPensumById } = usePensums();
   const [pensum, setPensum] = useState<any>(null);
   const [pensumLoading, setPensumLoading] = useState(true);
   const [pensumError, setPensumError] = useState<string | null>(null);
+
+  const [showQuestions, setShowQuestions] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
   const navigate = useNavigate();
 
@@ -33,39 +38,74 @@ export default function PostsListPage() {
   if (pensumError) return <Typography color="error">{pensumError}</Typography>;
   if (!pensum) return <Typography>No se encontró el plan académico.</Typography>;
 
-  const courseName =
-    pensum.semesters
-      .flatMap((s: any) => s.courses)
-      .find((c: any) => slugify(c.name) === course)?.name || course;
+  const questions = posts?.filter((p) => p.type === "Q") ?? [];
+  const suggestions = posts?.filter((p) => p.type === "S") ?? [];
+
+  const openedCount = [showQuestions, showSuggestions].filter(Boolean).length;
+  const gridSize = openedCount === 2 ? 6 : 12;
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="error"
-        onClick={() => navigate(`/student`)}
-        sx={{ mb: 2 }}
-      >
-        Volver
-      </Button>
+      <Grid container spacing={2}>
+        <Fab
+          color="error"
+          aria-label="inicio"
+          onClick={() => navigate("/student")}
+          sx={{ position: "fixed", bottom: 16, left: 16 }}
+        >
+          {"<"}
+        </Fab>
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setOpen(true)}
-        sx={{ mb: 2 }}
-      >
-        Nuevo Post
-      </Button>
+        {/* Preguntas */}
+        <Grid size={{ xs: 12, md: gridSize }}>
+          <Card sx={{ mb: 2 }}>
+            <CardHeader
+              title="Preguntas"
+              onClick={() => setShowQuestions((prev) => !prev)}
+              sx={{ ":hover": { cursor: "pointer" } }}
+              action={
+                <IconButton>
+                  {showQuestions ? "^" : "v"}
+                </IconButton>
+              }
+            />
+            <Collapse in={showQuestions} timeout="auto" unmountOnExit>
+              <CardContent>
+                {questions.length === 0 ? (
+                  <Typography variant="body2">No hay preguntas todavía.</Typography>
+                ) : (
+                  questions.map((q) => <PostCard key={q._id} post={q} currentUserId={user._id} />)
+                )}
+              </CardContent>
+            </Collapse>
+          </Card>
+        </Grid>
 
-      <PostList posts={posts ?? []} course={courseName} />
-
-      <ModalPost
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={(data) => addPost(data, plan!)}
-        courses={pensum.semesters.flatMap((s: any) => s.courses)}
-      />
+        {/* Sugerencias */}
+        <Grid size={{ xs: 12, md: gridSize }}>
+          <Card sx={{ mb: 2 }}>
+            <CardHeader
+              title="Sugerencias"
+              onClick={() => setShowSuggestions((prev) => !prev)}
+              sx={{ ":hover": { cursor: "pointer" } }}
+              action={
+                <IconButton>
+                  {showSuggestions ? "^" : "v"}
+                </IconButton>
+              }
+            />
+            <Collapse in={showSuggestions} timeout="auto" unmountOnExit>
+              <CardContent>
+                {suggestions.length === 0 ? (
+                  <Typography variant="body2">No hay sugerencias todavía.</Typography>
+                ) : (
+                  suggestions.map((s) => <PostCard key={s._id} post={s} currentUserId={user._id} />)
+                )}
+              </CardContent>
+            </Collapse>
+          </Card>
+        </Grid>
+      </Grid>
     </>
   );
 }

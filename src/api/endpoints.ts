@@ -5,6 +5,13 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const headers: HeadersInit = {};
 
+  // Agregar JWT si existe y la ruta no es /user (POST)
+  const token = localStorage.getItem("jwt");
+  const isRegister = url.endsWith("/user") && options?.method === "POST";
+  if (token && !isRegister) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   if (options?.body && !(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
@@ -92,7 +99,6 @@ export const getPostById = (id: string) =>
 
 export const createPost = (data: PostDto & { pensumId: string }) => {
   const url = `${BASE_URL}/post`;
-  console.log("createPost URL:", url);
 
   const formData = new FormData();
   formData.append("userId", data.userId);
@@ -134,7 +140,7 @@ export const deletePost = (id: string) =>
 
 // Comentarios
 export const getComments = (postId: string) =>
-  request<Comment[]>(`${BASE_URL}/comment?postId=${postId}`, { method: "GET" });
+  request<Comment[]>(`${BASE_URL}/comment/post/${postId}`, { method: "GET" });
 
 export const createComment = (data: { userId: string; postId: string; commentary: string }) =>
   request<Comment>(`${BASE_URL}/comment`, {
@@ -161,4 +167,54 @@ export const createSubComment = (commentId: string, data: { userId: string; comm
 export const deleteSubComment = (commentId: string, subCommentId: string) =>
   request<void>(`${BASE_URL}/comment/${commentId}/subcomment/${subCommentId}`, {
     method: "DELETE",
+  });
+
+// Reportes
+export const getReports = () =>
+  request<any[]>(`${BASE_URL}/report`, { method: "GET" });
+
+export const createReport = (data: { userId: string; targetType: string; targetId: string; reason: string }) =>
+  request<any>(`${BASE_URL}/report`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const getReport = (id: string) =>
+  request<any>(`${BASE_URL}/report/${id}`, { method: "GET" });
+
+export const editReport = (id: string, data: { reason: string, state: string, reviewedBy: string, reviewDescription: string, resolveAt: string }) =>
+  request<any>(`${BASE_URL}/report/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deleteReport = (id: string) =>
+  request<void>(`${BASE_URL}/report/${id}`, { method: "DELETE" });
+
+// Usuarios
+export const createUser = (data: { userName: string; userEmail: string; password: string; role: string }) =>
+  request<any>(`${BASE_URL}/user`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const getUsers = () =>
+  request<any[]>(`${BASE_URL}/user`, { method: "GET" });
+
+export const getUserById = (id: string) =>
+  request<any>(`${BASE_URL}/user/${id}`, { method: "GET" });
+
+export const updateUser = (id: string, data: { userName?: string; userEmail?: string; role?: string }) =>
+  request<any>(`${BASE_URL}/user/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deleteUser = (id: string) =>
+  request<void>(`${BASE_URL}/user/${id}`, { method: "DELETE" });
+
+export const login = (data: { userEmail: string; password: string }) =>
+  request<{ access_token: string; user: any }>(`${BASE_URL}/user/login`, {
+    method: "POST",
+    body: JSON.stringify(data),
   });

@@ -3,16 +3,24 @@ import { Grid, Typography } from "@mui/material";
 import { usePosts } from "../../hooks/usePosts";
 import { useState } from "react";
 import { ImageModal, PostContent, PostSidebar } from "../../components/apps/student/posts";
+import ErrorAlert from "../../components/common/ErrorAlert";
 
 export default function PostPage() {
   const { plan, course, post: postId } = useParams<{ plan: string; course: string; post: string }>();
   const { data: posts, loading, error } = usePosts(plan, course);
+  // const userId = localStorage.getItem("userId") || undefined;
 
-  const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [openImages, setOpenImages] = useState(false);
 
   if (loading) return <Typography>Cargando post...</Typography>;
-  if (error) return <Typography color="error">{error}</Typography>;
+  if (error) return (
+    <ErrorAlert
+      message={error}
+      actionLabel="Intentar de nuevo"
+      onAction={() => window.location.reload()}
+    />
+  );
 
   const post = posts.find((p) => p._id === postId);
   if (!post) return <Typography>No se encontró el post</Typography>;
@@ -26,17 +34,27 @@ export default function PostPage() {
 
       {/* Contenido principal */}
       <Grid size={{ xs: 12, md: 9 }} sx={{ height: "98vh", overflowY: "auto" }}>
-        <PostContent post={post} onImageClick={(i) => { setCurrentIndex(i); setOpen(true); }} />
+        <PostContent
+          post={post}
+          onImageClick={(i) => {
+            setCurrentIndex(i);
+            setOpenImages(true);
+          }}
+        />
       </Grid>
 
       {/* Modal de imágenes */}
       <ImageModal
         images={post.images || []}
-        open={open}
+        open={openImages}
         currentIndex={currentIndex}
-        onClose={() => setOpen(false)}
-        onPrev={() => setCurrentIndex((prev) => (prev === 0 ? post.images.length - 1 : prev - 1))}
-        onNext={() => setCurrentIndex((prev) => (prev === post.images.length - 1 ? 0 : prev + 1))}
+        onClose={() => setOpenImages(false)}
+        onPrev={() =>
+          setCurrentIndex((prev) => (prev === 0 ? post.images.length - 1 : prev - 1))
+        }
+        onNext={() =>
+          setCurrentIndex((prev) => (prev === post.images.length - 1 ? 0 : prev + 1))
+        }
         setCurrentIndex={setCurrentIndex}
       />
     </Grid>

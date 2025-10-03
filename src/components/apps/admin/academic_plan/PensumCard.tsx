@@ -13,7 +13,7 @@ const PensumCard: React.FC<PensumCardProps> = ({ pensum, onEdit, onDelete }) => 
   return (
     <Card variant="outlined" sx={{ mt: 2, marginBottom: 2, cursor: "pointer", boxShadow:1 }} onClick={handleToggle}>
       <CardHeader
-        title={pensum.name}
+        title={`${pensum.name} ${!pensum.description?``:` - ${pensum.description}`}`}
         subheader={`Total de semestres: ${pensum.totalSemesters}`}
         action={
           <>

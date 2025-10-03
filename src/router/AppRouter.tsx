@@ -2,38 +2,51 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
-import { AdminMainPage, PostPage, PostsListPage, StudentMainPage, RouterPage } from "./pages";
-
+import { AdminMainPage, PostPage, PostsListPage, StudentMainPage, LoginPage, ProfilePage } from "./pages";
+import RegisterPage from "./pages/RegisterPage";
+import PrivateRoute from "../components/apps/auth/PrivateRoute";
+import StudentLayout from "../components/layouts/StudentLayout";
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<RouterPage />} />
-                {/* Rutas Administrador */}
+                {/* Público */}
+                <Route path="/" element={<RegisterPage />} />
+                <Route path="/login" element={<LoginPage />} />
+
+                {/* Admin */}
                 <Route
                     path="/admin"
                     element={
-                        <ThemeProvider theme={adminTheme}>
-                            <TabsProvider>
-                                <AdminMainPage />
-                            </TabsProvider>
-                        </ThemeProvider>
+                        <PrivateRoute allowedRoles={["admin"]}>
+                            <ThemeProvider theme={adminTheme}>
+                                <TabsProvider>
+                                    <AdminMainPage />
+                                </TabsProvider>
+                            </ThemeProvider>
+                        </PrivateRoute>
                     }
                 />
 
-                {/* Rutas Estudiante */}
+                {/* Student */}
                 <Route
                     path="/student"
                     element={
-                        <StudentMainPage />
+                        <PrivateRoute allowedRoles={["student", "admin"]}>
+                            <StudentLayout />
+                        </PrivateRoute>
                     }
-                />
-                <Route path="/student/:plan/:course" element={<PostsListPage />} />
-                <Route path="/student/:plan/:course/:post" element={<PostPage />} />
+                >
+                    <Route index element={<StudentMainPage />} />
+                    <Route path=":plan/:course" element={<PostsListPage />} />
+                    <Route path=":plan/:course/:post" element={<PostPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                </Route>
+
+                {/* Not Found */}
                 <Route path="*" element={<h1>404 - Not Found</h1>} />
-                
             </Routes>
-        </BrowserRouter>
+        </BrowserRouter>    
     );
 }

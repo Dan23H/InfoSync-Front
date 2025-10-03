@@ -1,7 +1,5 @@
   import * as React from 'react';
-  import Tabs from '@mui/material/Tabs';
-  import Tab from '@mui/material/Tab';
-  import Box from '@mui/material/Box';
+  import { Box, Tab, Tabs } from '@mui/material';
   import { useTabs } from '../../../context/TabsContext';
 
   export default function ColorTabs() {

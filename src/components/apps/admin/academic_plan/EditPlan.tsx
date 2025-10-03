@@ -4,7 +4,9 @@ import Selector from "./Selector";
 import CustomTextbox from "./CustomTextbox";
 
 import type { Pensum, CourseDto } from "../../../../models";
-import { getPensumById, updatePensum } from "../../../../api/pensum";
+import { getPensumById, updatePensum } from "../../../../api/endpoints";
+import ErrorAlert from "../../../common/ErrorAlert";
+import { useAuth } from "../../../../context/AuthContext";
 
 interface EditPlanProps {
   id: string | null;
@@ -12,6 +14,7 @@ interface EditPlanProps {
 }
 
 export default function EditPlan({ id, onClose }: EditPlanProps) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<Pensum | null>(null);
   const [semestreActual, setSemestreActual] = useState(1);
@@ -117,10 +120,16 @@ export default function EditPlan({ id, onClose }: EditPlanProps) {
 
   const handleSubmitPlan = async () => {
     if (!plan) return;
-    console.log(plan)
+    if (!user?._id) {
+      alert("No se detectó un usuario válido para actualizar el plan.");
+      return;
+    }
+
     try {
       const payload = {
         name: plan.name,
+        description: plan.description,
+        userId: user._id,
         totalSemesters: plan.totalSemesters,
         semesters: plan.semesters.map((s) => ({
           semesterNumber: s.semesterNumber,
@@ -130,6 +139,7 @@ export default function EditPlan({ id, onClose }: EditPlanProps) {
           })),
         })),
       };
+
       await updatePensum(plan._id, payload);
       alert("Plan actualizado correctamente");
       await fetchPlan();
@@ -154,9 +164,11 @@ export default function EditPlan({ id, onClose }: EditPlanProps) {
     </Box>);
   if (error) return (
     <Box>
-      <Typography sx={{ color: "red" }}>
-        {error}
-      </Typography>
+      <ErrorAlert
+        message={error}
+        actionLabel="Intentar de nuevo más tarde"
+        onAction={() => setError(null)}
+      />
     </Box>
   );
   if (!plan) return (
@@ -201,6 +213,23 @@ export default function EditPlan({ id, onClose }: EditPlanProps) {
             />
           </Box>
         </Grid>
+      </Grid>
+
+      <Grid sx={{ xs: 12, md: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          minRows={3}
+          label="Descripción"
+          value={plan.description ?? ""}
+          inputProps={{ maxLength: 50 }}
+          helperText={`${plan.description?.length ?? 0}/50 caracteres`}
+          onChange={(e) =>
+            setPlan((prev) =>
+              prev ? { ...prev, description: e.target.value } : prev
+            )
+          }
+        />
       </Grid>
 
       <CustomTextbox

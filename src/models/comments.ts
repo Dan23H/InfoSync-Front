@@ -11,6 +11,6 @@ export interface Comment {
   postId: string;
   commentary: string;
   createdAt: string;
-  subcomments?: SubComment[];
+  subComments?: SubComment[];
   updatedAt?: string;
 }

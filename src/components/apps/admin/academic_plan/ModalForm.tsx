@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Modal, TextField, RadioGroup, Radio, FormControlLabel } from "@mui/material";
 import type { ModalFormProps } from "../../../../models";
 import { useState } from "react";
+import ErrorAlert from "../../../common/ErrorAlert";
 
 export default function ModalForm({ open, onClose, onConfirm, temp, setTemp, title, subtitle }: ModalFormProps) {
   const validCourseName = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s0-9]+$/;
@@ -84,9 +85,11 @@ export default function ModalForm({ open, onClose, onConfirm, temp, setTemp, tit
           )}
 
           {error && (
-            <Typography color="error" variant="caption">
-              {error}
-            </Typography>
+            <ErrorAlert
+              message={error}
+              actionLabel="Intentar de nuevo más tarde"
+              onAction={() => setError(null)}
+            />
           )}
 
           <TextField

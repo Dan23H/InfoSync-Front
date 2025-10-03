@@ -2,7 +2,7 @@ export interface Post {
   _id: string;
   userId: string;
   pensumId: string;
-  type: "Q" | "R" | "S"; // Si manejas más adelante "S" (sugerencia)
+  type: "Q" | "S";
   title: string;
   subject: string;
   description: string;
@@ -15,7 +15,7 @@ export interface Post {
 
 export interface PostDto {
   userId: string;
-  type: "Q" | "R";
+  type: "Q" | "S";
   title: string;
   subject: string;
   description: string;

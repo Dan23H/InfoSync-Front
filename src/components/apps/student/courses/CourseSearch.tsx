@@ -1,4 +1,4 @@
-import { Box, List, ListItemButton, Paper, TextField } from "@mui/material";
+import { Box, List, ListItemButton, Paper, TextField, Typography } from "@mui/material";
 import { useRef } from "react";
 import { useDeselect } from "../../../../hooks/useDeselect";
 
@@ -40,7 +40,9 @@ export default function CourseSearch({ value, onChange, suggestions, showSuggest
                   setShowSuggestions(false);
                 }}
               >
-                {s}
+                <Typography fontFamily={"sans-serif"}>
+                  {s}
+                </Typography>
               </ListItemButton>
             ))}
           </List>

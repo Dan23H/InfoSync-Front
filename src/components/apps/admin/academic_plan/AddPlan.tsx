@@ -3,8 +3,9 @@ import { Box, Button, Typography, TextField, Select, MenuItem, FormControl, Inpu
 import CustomTextbox from "./CustomTextbox";
 import Selector from "./Selector";
 import type { Pensum, CourseDto } from "../../../../models";
-import { createPensum } from "../../../../api/pensum";
+import { createPensum } from "../../../../api/endpoints";
 import { usePensums } from "../../../../hooks/usePensums";
+import { useAuth } from "../../../../context/AuthContext";
 
 interface AddPlanProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
   const [semestresTotales, setSemestresTotales] = useState(9);
   const [planAnterior, setPlanAnterior] = useState("No");
   const { data: pensums, loading } = usePensums();
+  const { user } = useAuth();
 
   // Para estructura personalizada de @mui
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -33,8 +35,10 @@ export default function AddPlan({ onClose }: AddPlanProps) {
   const [plan, setPlan] = useState<Pensum>({
     _id: "",
     name: "",
+    description: "",
     totalSemesters: semestresTotales,
     semesters: makeEmptySemesters(semestresTotales),
+    userId: ""
   });
 
   const handleSelectPlanAnterior = (value: string) => {
@@ -60,6 +64,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
         name: "",
         totalSemesters: semestresTotales,
         semesters: makeEmptySemesters(semestresTotales),
+        userId: ""
       });
       setPlanName("");
       setSemestreActual(1);
@@ -163,8 +168,10 @@ export default function AddPlan({ onClose }: AddPlanProps) {
     try {
       const body = {
         name: plan.name,
+        description: plan.description,
         totalSemesters: plan.totalSemesters,
         semesters: plan.semesters,
+        userId: user._id
       };
       const created = await createPensum(body);
       console.log("Creado:", created);
@@ -177,8 +184,10 @@ export default function AddPlan({ onClose }: AddPlanProps) {
       setPlan({
         _id: "",
         name: "",
+        description: "",
         totalSemesters: 9,
         semesters: makeEmptySemesters(9),
+        userId: ""
       });
       onClose();
     } catch (e: any) {
@@ -215,7 +224,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
               <MenuItem value="No">No</MenuItem>
 
               {
-              loading && <MenuItem disabled><Typography>Cargando...</Typography></MenuItem>}
+                loading && <MenuItem disabled><Typography>Cargando...</Typography></MenuItem>}
 
               {pensums?.map((p) => (
                 <MenuItem key={p._id} value={p._id}>
@@ -244,6 +253,19 @@ export default function AddPlan({ onClose }: AddPlanProps) {
             />
           </Box>
         </Grid>
+      </Grid>
+
+      <Grid sx={{xs:12,md:12}}>
+        <TextField
+          fullWidth
+          multiline
+          minRows={3}
+          inputProps={{ maxLength: 50 }}
+          helperText={`${plan.description?.length ?? 0}/50 caracteres`}
+          label="Descripción"
+          value={plan.description}
+          onChange={(e) => setPlan((prev) => ({ ...prev, description: e.target.value }))}
+        />
       </Grid>
 
       {/* Cursos del semestre seleccionado */}

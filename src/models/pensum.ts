@@ -15,8 +15,10 @@ export interface Pensum {
   name: string;
   totalSemesters: number;
   semesters: SemesterDto[];
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
+  userId: string;
 }
 
 export interface PensumDto {

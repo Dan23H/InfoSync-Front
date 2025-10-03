@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPosts, createPost } from "../api/pensum";
+import { getPosts, createPost } from "../api/endpoints";
 import type { Post, PostDto } from "../models";
 import { slugify } from "../utils/slugify";
 

@@ -1,6 +1,8 @@
 import { Box, Typography, Avatar, Card, CardContent, Grid } from "@mui/material";
-import CommentsSection from "./CommentsSection";
+import CommentsSection from "../comments/CommentsSection";
 import type { Post } from "../../../../models";
+import { useAuthor } from "../../../../hooks/useAuthor";
+import { useAuth } from "../../../../context";
 
 interface PostContentProps {
   post: Post;
@@ -8,14 +10,17 @@ interface PostContentProps {
 }
 
 export default function PostContent({ post, onImageClick }: PostContentProps) {
+  const { user: author, loading } = useAuthor(post.userId || null);
+  const { user } = useAuth();
+
   return (
-    <Card sx={{ backgroundColor: "#e0e0e0", p: 2 }}>
+    <Card sx={{ backgroundColor: "#D9D9D9", p: 2 }}>
       <CardContent>
         {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <Avatar sx={{ bgcolor: "brown", mr: 1 }} />
           <Typography variant="body2" fontWeight="bold">
-            {post.userId}
+            {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
           </Typography>
           <Typography variant="body2" sx={{ ml: 1 }}>
             {new Date(post.createdAt).toLocaleDateString()}
@@ -121,7 +126,11 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
       </CardContent>
 
       {/* Comentarios */}
-      <CommentsSection postId={post._id} userId="usuario123" />
+      <CommentsSection
+        postId={post._id}
+        userId={user._id}
+        onCommentCountChange={() => {}}
+      />
     </Card>
   );
 }

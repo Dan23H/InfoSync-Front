@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography } from "@mui/material";
+import { useAuth } from "../../../../context/AuthContext";
+import { usePlan } from "../../../../context/PlanContext";
 
 interface ModalPostProps {
     open: boolean;
@@ -10,17 +12,22 @@ interface ModalPostProps {
 }
 
 export default function ModalPost({ open, onClose, onSubmit, courses, initialData }: ModalPostProps) {
+    const { user } = useAuth();
+    const { planId } = usePlan();
+
     const initialForm = {
         title: initialData?.title || "",
         subject: initialData?.subject || "",
-        course: initialData?.course || "",
+        course: initialData?.course || (courses[0]?.name ?? ""),
         type: initialData?.type || "",
         description: initialData?.description || "",
         images: [] as File[],
         files: [] as File[],
     };
-
+    
     const [form, setForm] = useState(initialForm);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
 
     const handleChange = (field: string, value: any) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -35,21 +42,52 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
         }
     };
 
-    const handleSubmit = () => {
-        console.log(form);
-        if (!form.title || !form.subject || !form.type || !form.description) {
-            alert("Por favor, completa todos los campos obligatorios.");
-            return;
+    const validate = () => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!form.title || form.title.trim().length < 5) {
+            newErrors.title = "El título debe tener al menos 5 caracteres.";
         }
-        onSubmit(form);
+
+        if (!form.subject) {
+            newErrors.subject = "Las palabras clave son obligatorias.";
+        } else if (form.subject.endsWith(" ")) {
+            newErrors.subject = "Las palabras clave no deben terminar en espacio.";
+        }
+
+        if (!form.description || form.description.trim().length < 10) {
+            newErrors.description = "La descripción debe tener al menos 10 caracteres.";
+        }
+
+        if (!form.course) {
+            if (courses.length > 0) {
+                handleChange("course", courses[0].name); // fallback al primero
+            } else {
+                newErrors.course = "Debes seleccionar una asignatura.";
+            }
+        }
+
+        if (!form.type) {
+            newErrors.type = "Debes seleccionar un tipo de publicación.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = () => {
+        if (!validate()) return;
+        onSubmit({...form, userId: user._id, pensumId: planId});
+        console.log({...form, userId: user._id, pensumId: planId})
         onClose();
     };
 
     useEffect(() => {
         if (!open) {
             setForm(initialForm);
+            setErrors({});
         }
-    }, [open, initialData]);
+    }, [open, initialData, courses]);
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: "100%" }} >
@@ -63,6 +101,8 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                             label="Título"
                             value={form.title}
                             onChange={(e) => handleChange("title", e.target.value)}
+                            error={!!errors.title}
+                            helperText={errors.title}
                         />
                     </Grid>
                     <Grid size={{ xs: 6 }}>
@@ -73,7 +113,13 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                             onChange={(_, value) => handleChange("course", value || "")}
                             onInputChange={(_, value) => handleChange("course", value)}
                             renderInput={(params) => (
-                                <TextField {...params} fullWidth label="Asignatura" />
+                                <TextField
+                                    {...params}
+                                    fullWidth
+                                    label="Asignatura"
+                                    error={!!errors.course}
+                                    helperText={errors.course}
+                                />
                             )}
                         />
                     </Grid>
@@ -85,7 +131,8 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                             label="Palabras clave"
                             value={form.subject}
                             onChange={(e) => handleChange("subject", e.target.value)}
-                            helperText="Ejemplo: integrales, límites, cálculo diferencial"
+                            helperText={errors.subject || "Ejemplo (una sola palabra): integrales"}
+                            error={!!errors.subject}
                         />
                     </Grid>
 
@@ -100,19 +147,22 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                 <FormControlLabel value="Q" control={<Radio />} label="Pregunta" />
                                 <FormControlLabel value="S" control={<Radio />} label="Sugerencia" />
                             </RadioGroup>
+                            {errors.type && <p style={{ color: "red", fontSize: "0.8rem" }}>{errors.type}</p>}
                         </Box>
                     </Grid>
 
                     {/* Descripción */}
                     <Grid size={{ xs: 12 }}>
-                        <Box sx={{ maxHeight: 150, overflowY: "auto", p:1 }}>
+                        <Box sx={{ maxHeight: 150, overflowY: "auto", p: 1 }}>
                             <TextField
                                 fullWidth
                                 label="Descripción"
-                                multiline={true}
+                                multiline
                                 minRows={4}
                                 value={form.description}
                                 onChange={(e) => handleChange("description", e.target.value)}
+                                error={!!errors.description}
+                                helperText={errors.description}
                             />
                         </Box>
                     </Grid>
@@ -131,7 +181,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                             />
                         </Button>
                         <Box sx={{ mt: 1, maxHeight: 120, overflowY: "auto" }}>
-                            {form.images? <Typography variant="subtitle2">Subiendo {form.images.length} imágenes:</Typography> : null}
+                            {form.images ? <Typography variant="subtitle2">Subiendo {form.images.length} imágenes:</Typography> : null}
                             {form.images.map((file, index) => (
                                 <Box
                                     key={index}
@@ -148,8 +198,8 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                     <Typography style={{ fontSize: "0.85rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
                                         {file.name}
                                     </Typography>
-                                    <Typography style={{ fontSize: "0.75rem", color: "gray", alignItems:"right" }}>
-                                        {file.size < 1000000 ? `${(file.size / 1024).toFixed(2)} KB` : `${(file.size / 1024 / 1024).toFixed(2)} MB` }
+                                    <Typography style={{ fontSize: "0.75rem", color: "gray", alignItems: "right" }}>
+                                        {file.size < 1000000 ? `${(file.size / 1024).toFixed(2)} KB` : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                     </Typography>
                                     <Button
                                         size="small"
