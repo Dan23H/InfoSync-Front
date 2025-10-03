@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TabsProvider } from "../context/TabsContext";
 import { ThemeProvider } from "@mui/material";
 import { adminTheme } from "../themes/adminTheme";
-import { AdminMainPage, PostPage, PostsListPage, StudentMainPage, LoginPage, ProfilePage } from "./pages";
-import RegisterPage from "./pages/RegisterPage";
+import { AdminMainPage, PostPage, PostsListPage, StudentMainPage, LoginPage, ProfilePage, RegisterPage, IndexPage } from "./pages";
 import PrivateRoute from "../components/apps/auth/PrivateRoute";
 import StudentLayout from "../components/layouts/StudentLayout";
 
@@ -12,7 +11,8 @@ export default function AppRouter() {
         <BrowserRouter>
             <Routes>
                 {/* Público */}
-                <Route path="/" element={<RegisterPage />} />
+                <Route path="/" element={<IndexPage />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
 
                 {/* Admin */}

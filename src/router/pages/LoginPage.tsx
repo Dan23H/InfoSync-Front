@@ -1,9 +1,11 @@
-import { Button, FormControl, Grid, Input, InputLabel } from "@mui/material";
+import { Button, FormControl, Input, InputLabel, Paper, Typography, Box } from "@mui/material";
 import { login } from "../../api/endpoints";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ErrorAlert from "../../components/common/ErrorAlert";
+// Si tienes un logo, importa aquí:
+// import Logo from "../../assets/logo.png";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -26,9 +28,36 @@ export default function LoginPage() {
     };
 
     return (
-        <Grid container spacing={2} padding={2} justifyContent="center">
-            <Grid sx={{ xs: 12, sm: 6 }} >
-                <form onSubmit={handleLogin}>
+        <Box
+            sx={{
+                minHeight: "100vh",
+                background: "linear-gradient(135deg, #e3f2fd 0%, #fff 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            <Paper
+                elevation={6}
+                sx={{
+                    padding: 4,
+                    borderRadius: 3,
+                    minWidth: { xs: "90vw", sm: 400 },
+                    maxWidth: 400,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                {/* Logo y título */}
+                {/* <img src={Logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} /> */}
+                <Typography variant="h5" fontWeight={700} color="primary" mb={2}>
+                    Iniciar sesión
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={3} align="center">
+                    Accede a tu cuenta académica para continuar
+                </Typography>
+                <form onSubmit={handleLogin} style={{ width: "100%" }}>
                     <FormControl fullWidth margin="normal">
                         <InputLabel htmlFor="email">Email</InputLabel>
                         <Input
@@ -61,13 +90,17 @@ export default function LoginPage() {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mt: 2 }}
+                        sx={{ mt: 2, py: 1.2, fontWeight: 600, fontSize: "1rem" }}
                         disabled={!email || !password}
                     >
                         Iniciar sesión
                     </Button>
                 </form>
-            </Grid>
-        </Grid>
+                {/* Puedes agregar aquí un enlace para recuperar contraseña o registrarse */}
+                {/* <Typography variant="body2" mt={2}>
+                    ¿Olvidaste tu contraseña?
+                </Typography> */}
+            </Paper>
+        </Box>
     );
 }

@@ -116,10 +116,14 @@ export const createPost = (data: PostDto & { pensumId: string }) => {
     (data.images ?? []).forEach((f: any) => { if (f instanceof File) fd.append("images", f); });
     (data.files ?? []).forEach((f: any) => { if (f instanceof File) fd.append("files", f); });
 
-    // Si el backend requiere estos campos incluso en multipart, se podrían omitir aquí
-    // y dejar que el backend setee defaults.
+    // Agrega el header Authorization explícitamente
+    const token = localStorage.getItem("jwt");
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
-    return request<Post>(url, { method: "POST", body: fd });
+    return request<Post>(url, { method: "POST", body: fd, headers });
   }
 
   const payload = {

@@ -48,24 +48,30 @@ export default function ProfilePage() {
                             </Avatar>
 
                             {/* Datos */}
-                            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                            <Grid sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
                                 {isEditing ? (
                                     <>
-                                        <TextField
-                                            label="Nombre"
-                                            defaultValue={user?.userName}
-                                            fullWidth
-                                            sx={{ mb: 2 }}
-                                        />
-                                        <Box display="flex" justifyContent="center">
-                                            <Button variant="contained" onClick={(e) => {
-                                                e.preventDefault();
-                                                navigate("/student/profile");
-                                            }}>Guardar cambios</Button>
-                                        </Box>
+                                        <Grid display="flex" justifyContent="center" sx={{ width: "100%" }}>
+                                            <TextField
+                                                label="Nombre"
+                                                defaultValue={user?.userName}
+                                                sx={{ mb: 2, width: "75%" }}
+                                            />
+                                        </Grid>
+                                        <Grid display="flex" justifyContent="center" sx={{ width: "100%" }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    navigate("/student/profile");
+                                                }}
+                                            >
+                                                Guardar cambios
+                                            </Button>
+                                        </Grid>
                                     </>
                                 ) : (
-                                    <>
+                                    <Grid>
                                         <Typography variant="body1"><strong>Nombre:</strong> {user?.userName ?? "N/A"}</Typography>
                                         <Typography variant="body1">
                                             <strong>Correo:</strong>{" "}
@@ -96,12 +102,12 @@ export default function ProfilePage() {
                                                     ? "Sancionado"
                                                     : "N/A"}
                                         </Typography>
-                                    </>
+                                    </Grid>
                                 )}
-                            </Box>
+                            </Grid>
 
                             {/* Botón editar */}
-                            <IconButton
+                            {isEditing ? <></> : <IconButton
                                 onClick={(e) => {
                                     e.preventDefault();
                                     navigate("/student/profile/edit");
@@ -109,7 +115,7 @@ export default function ProfilePage() {
                                 sx={{ ml: "auto" }}
                             >
                                 <img src={EditSVG} alt="editar-perfil" width={20} height={20} />
-                            </IconButton>
+                            </IconButton>}
                         </Box>
 
                         {/* Divider central */}

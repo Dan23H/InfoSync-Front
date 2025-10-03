@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Grid, FormControl, InputLabel, Input, Button, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Paper, FormControl, InputLabel, Input, Button, MenuItem, Select, Typography } from "@mui/material";
 import { createUser } from "../../api/endpoints";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../../components/common/ErrorAlert";
+// Si tienes un logo, importa aquí:
+// import Logo from "../../assets/logo.png";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -34,12 +36,36 @@ export default function RegisterPage() {
     };
 
     return (
-        <Grid container spacing={2} padding={2} justifyContent="center">
-            <Grid sx={{ xs: 12, sm: 6 }} >
-                <Typography variant="h5" align="center" gutterBottom>
+        <Box
+            sx={{
+                minHeight: "100vh",
+                background: "linear-gradient(135deg, #e3f2fd 0%, #fff 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            <Paper
+                elevation={6}
+                sx={{
+                    padding: 4,
+                    borderRadius: 3,
+                    minWidth: { xs: "90vw", sm: 400 },
+                    maxWidth: 400,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                {/* Logo y título */}
+                {/* <img src={Logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} /> */}
+                <Typography variant="h5" fontWeight={700} color="primary" mb={2}>
                     Registro
                 </Typography>
-                <form onSubmit={handleRegister}>
+                <Typography variant="body2" color="text.secondary" mb={3} align="center">
+                    Crea tu cuenta académica para acceder a la plataforma
+                </Typography>
+                <form onSubmit={handleRegister} style={{ width: "100%" }}>
                     <FormControl fullWidth margin="normal">
                         <InputLabel htmlFor="email">Email</InputLabel>
                         <Input
@@ -104,7 +130,7 @@ export default function RegisterPage() {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mt: 2 }}
+                        sx={{ mt: 2, py: 1.2, fontWeight: 600, fontSize: "1rem" }}
                         disabled={
                             !email ||
                             !userName ||
@@ -116,7 +142,10 @@ export default function RegisterPage() {
                         Registrarse
                     </Button>
                 </form>
-            </Grid>
-        </Grid>
+                <Typography variant="body2" mt={2}>
+                    ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+                </Typography>
+            </Paper>
+        </Box>
     );
 }

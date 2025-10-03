@@ -58,7 +58,7 @@ export default function StudentMainPage() {
       <Grid container spacing={2} alignItems="center">
         <Grid size={{ xs: 12, sm: 12, md: 4 }}>
           <Typography variant="h6" align="center">
-            Filtros opcionales: {planId}
+            Filtros opcionales:
           </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 4 }}>
