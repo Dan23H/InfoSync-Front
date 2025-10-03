@@ -20,6 +20,6 @@ export interface PostDto {
   subject: string;
   description: string;
   course: string;
-  images?: string[];
-  files?: string[];
+  images?: (string | File)[];
+  files?: (string | File)[];
 }

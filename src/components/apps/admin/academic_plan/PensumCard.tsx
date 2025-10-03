@@ -23,7 +23,7 @@ const PensumCard: React.FC<PensumCardProps> = ({ pensum, onEdit, onDelete }) => 
                 onEdit(pensum._id);
               }}
             >
-              <img src={EditSVG} alt="editar" width={20} height={20} />
+              <img src={EditSVG} alt="editar-pensum" width={20} height={20} />
             </IconButton>
             <IconButton
               onClick={(e) => {
@@ -31,7 +31,7 @@ const PensumCard: React.FC<PensumCardProps> = ({ pensum, onEdit, onDelete }) => 
                 onDelete(pensum._id);
               }}
             >
-              <img src={DeleteSVG} alt="eliminar" width={20} height={20} />
+              <img src={DeleteSVG} alt="eliminar-pensum" width={20} height={20} />
             </IconButton>
           </>
         }

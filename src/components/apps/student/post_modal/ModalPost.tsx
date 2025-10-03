@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography, FormControl, FormLabel, FormHelperText } from "@mui/material";
 import { useAuth } from "../../../../context/AuthContext";
 import { usePlan } from "../../../../context/PlanContext";
 
@@ -19,7 +19,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
         title: initialData?.title || "",
         subject: initialData?.subject || "",
         course: initialData?.course || (courses[0]?.name ?? ""),
-        type: initialData?.type || "",
+        type: (initialData?.type as "Q" | "S") || "Q", // default válido
         description: initialData?.description || "",
         images: [] as File[],
         files: [] as File[],
@@ -77,8 +77,23 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
 
     const handleSubmit = () => {
         if (!validate()) return;
-        onSubmit({...form, userId: user._id, pensumId: planId});
-        console.log({...form, userId: user._id, pensumId: planId})
+
+        const payload = {
+            userId: user._id,
+            pensumId: planId,
+            title: form.title.trim(),
+            subject: form.subject.split(" ")[0].toLowerCase(),
+            description: form.description.trim(),
+            course: form.course.trim(),
+            type: form.type as "Q" | "S",
+            images: form.images?.length ? form.images : [],
+            files: form.files?.length ? form.files : []
+        };
+
+        console.log("Payload a enviar:", payload);
+        console.log("JSON.stringify(payload):", JSON.stringify(payload));
+
+        onSubmit(payload);
         onClose();
     };
 
@@ -138,33 +153,34 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
 
                     {/* Tipo */}
                     <Grid size={{ xs: 12 }}>
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                            <RadioGroup
-                                row
-                                value={form.type}
-                                onChange={(e) => handleChange("type", e.target.value)}
-                            >
-                                <FormControlLabel value="Q" control={<Radio />} label="Pregunta" />
-                                <FormControlLabel value="S" control={<Radio />} label="Sugerencia" />
-                            </RadioGroup>
-                            {errors.type && <p style={{ color: "red", fontSize: "0.8rem" }}>{errors.type}</p>}
+                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                            <FormControl error={!!errors.type}>
+                                <FormLabel>Tipo</FormLabel>
+                                <RadioGroup
+                                    row
+                                    value={form.type}
+                                    onChange={(_, v) => handleChange("type", v as "Q" | "S")}
+                                >
+                                    <FormControlLabel value="Q" control={<Radio />} label="Pregunta (Q)" />
+                                    <FormControlLabel value="S" control={<Radio />} label="Solicitud (S)" />
+                                </RadioGroup>
+                                {!!errors.type && <FormHelperText>{errors.type}</FormHelperText>}
+                            </FormControl>
                         </Box>
                     </Grid>
 
                     {/* Descripción */}
                     <Grid size={{ xs: 12 }}>
-                        <Box sx={{ maxHeight: 150, overflowY: "auto", p: 1 }}>
-                            <TextField
-                                fullWidth
-                                label="Descripción"
-                                multiline
-                                minRows={4}
-                                value={form.description}
-                                onChange={(e) => handleChange("description", e.target.value)}
-                                error={!!errors.description}
-                                helperText={errors.description}
-                            />
-                        </Box>
+                        <TextField
+                            fullWidth
+                            multiline
+                            minRows={3}
+                            label="Descripción"
+                            value={form.description}
+                            onChange={(e) => handleChange("description", e.target.value)}
+                            error={!!errors.description}
+                            helperText={errors.description}
+                        />
                     </Grid>
 
 

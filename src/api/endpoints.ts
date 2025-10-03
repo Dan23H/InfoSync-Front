@@ -1,11 +1,10 @@
 import type { CourseDto, CourseType, PostDto, Pensum, Post, PensumDto, Comment } from "../models";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const headers: HeadersInit = {};
 
-  // Agregar JWT si existe y la ruta no es /user (POST)
   const token = localStorage.getItem("jwt");
   const isRegister = url.endsWith("/user") && options?.method === "POST";
   if (token && !isRegister) {
@@ -25,7 +24,8 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
-    throw new Error(`Error ${res.status}: ${await res.text()}`);
+    const msg = await res.text().catch(() => "");
+    throw new Error(`${res.status} ${res.statusText} ${msg}`.trim());
   }
 
   return res.json();
@@ -100,30 +100,43 @@ export const getPostById = (id: string) =>
 export const createPost = (data: PostDto & { pensumId: string }) => {
   const url = `${BASE_URL}/post`;
 
-  const formData = new FormData();
-  formData.append("userId", data.userId);
-  formData.append("pensumId", data.pensumId);
-  formData.append("type", data.type ?? "Q");
-  formData.append("title", data.title);
-  formData.append("subject", data.subject);
-  formData.append("description", data.description);
-  formData.append("course", data.course);
+  const hasBinary =
+    (Array.isArray(data.images) && data.images.some((f: any) => f instanceof File)) ||
+    (Array.isArray(data.files) && data.files.some((f: any) => f instanceof File));
 
-  if (data.images && data.images.length > 0) {
-    data.images.forEach((img) => {
-      formData.append("images", img);
-    });
+  if (hasBinary) {
+    const fd = new FormData();
+    fd.append("userId", data.userId);
+    fd.append("pensumId", data.pensumId);
+    fd.append("type", data.type);
+    fd.append("title", data.title);
+    fd.append("subject", data.subject);
+    fd.append("description", data.description);
+    fd.append("course", data.course);
+    (data.images ?? []).forEach((f: any) => { if (f instanceof File) fd.append("images", f); });
+    (data.files ?? []).forEach((f: any) => { if (f instanceof File) fd.append("files", f); });
+
+    // Si el backend requiere estos campos incluso en multipart, se podrían omitir aquí
+    // y dejar que el backend setee defaults.
+
+    return request<Post>(url, { method: "POST", body: fd });
   }
 
-  if (data.files && data.files.length > 0) {
-    data.files.forEach((file) => {
-      formData.append("files", file);
-    });
-  }
+  const payload = {
+    userId: data.userId,
+    pensumId: data.pensumId,
+    type: data.type,
+    title: data.title,
+    subject: data.subject,
+    description: data.description,
+    course: data.course,
+    images: Array.isArray(data.images) ? (data.images.filter((x): x is string => typeof x === "string")) : [],
+    files: Array.isArray(data.files) ? (data.files.filter((x): x is string => typeof x === "string")) : [],
+  };
 
   return request<Post>(url, {
     method: "POST",
-    body: formData,
+    body: JSON.stringify(payload),
   });
 };
 

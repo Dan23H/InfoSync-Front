@@ -39,14 +39,15 @@ export default function AppRouter() {
                     }
                 >
                     <Route index element={<StudentMainPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="profile/edit" element={<ProfilePage />} />
                     <Route path=":plan/:course" element={<PostsListPage />} />
                     <Route path=":plan/:course/:post" element={<PostPage />} />
-                    <Route path="profile" element={<ProfilePage />} />
                 </Route>
 
                 {/* Not Found */}
                 <Route path="*" element={<h1>404 - Not Found</h1>} />
             </Routes>
-        </BrowserRouter>    
+        </BrowserRouter>
     );
 }
