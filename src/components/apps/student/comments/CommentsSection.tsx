@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Avatar, TextField, Button } from "@mui/material";
-import { getComments, createComment, createSubComment } from "../../../../api/endpoints";
+import { getComments, createComment, createSubComment } from "../../../../api";
 import type { Comment } from "../../../../models";
 import CommentItem from "./CommentItem";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Card, CardContent, Button, CircularProgress, Chip } from "@mui/material";
-import { getReports } from "../../../../api/endpoints";
+import { getReports } from "../../../../api";
 
 interface Report {
   _id: string;

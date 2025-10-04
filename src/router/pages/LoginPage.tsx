@@ -1,5 +1,5 @@
 import { Button, FormControl, Input, InputLabel, Paper, Typography, Box } from "@mui/material";
-import { login } from "../../api/endpoints";
+import { login } from "../../api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";

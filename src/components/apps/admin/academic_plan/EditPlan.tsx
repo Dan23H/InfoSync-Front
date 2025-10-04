@@ -4,7 +4,7 @@ import Selector from "./Selector";
 import CustomTextbox from "./CustomTextbox";
 
 import type { Pensum, CourseDto } from "../../../../models";
-import { getPensumById, updatePensum } from "../../../../api/endpoints";
+import { getPensumById, updatePensum } from "../../../../api";
 import ErrorAlert from "../../../common/ErrorAlert";
 import { useAuth } from "../../../../context/AuthContext";
 

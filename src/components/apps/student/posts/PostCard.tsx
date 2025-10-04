@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
 import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSelected, LikeUnselected } from "../../../../assets";
 import { useCommentsCount } from "../../../../hooks/useCounter";
-import { createReport } from "../../../../api/endpoints";
+import { createReport } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
 
 interface PostCardProps {
@@ -62,6 +62,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
       console.error("Error al enviar el reporte", err);
     }
   };
+
+  const rankingNumber = (post.likeCount ?? 0) - (post.dislikeCount ?? 0)
 
   return (
     <>
@@ -139,8 +141,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               Compartir
             </Typography>
             {post.type === "S" && (
-              <Typography variant="body2" color="primary">
-                Recomendado
+              <Typography variant="body2" sx= {rankingNumber > 0 ? { color: "green" } : rankingNumber < 0 ? { color: "red" } : {}}>
+                {rankingNumber > 0 ? "Recomendado" : rankingNumber === 0 ? "Variado o no votado" : "No Recomendado"}
               </Typography>
             )}
           </Box>

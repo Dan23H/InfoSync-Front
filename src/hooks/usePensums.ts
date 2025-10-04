@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getPensums, createPensum, updatePensum, deletePensum, getPensumById } from "../api/endpoints";
+import { getPensums, createPensum, updatePensum, deletePensum, getPensumById } from "../api";
 import type { PensumDto, Pensum } from "../models";
 
 export function usePensums() {

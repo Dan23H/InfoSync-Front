@@ -14,7 +14,7 @@ interface PostSidebarItemProps {
 export default function PostSidebarItem({ post, plan, course, isActive }: PostSidebarItemProps) {
   const { user: author, loading } = useAuthor(post.userId || null);
   const commentsCount = useCommentsCount(post._id || "0");
-
+  const rankingNumber = (post.likeCount ?? 0) - (post.dislikeCount ?? 0)
   return (
     <ListItem
       key={post._id}
@@ -59,8 +59,8 @@ export default function PostSidebarItem({ post, plan, course, isActive }: PostSi
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5 }}>
         <Typography variant="caption">{commentsCount} comentarios</Typography>
         {post.type === "S" && (
-          <Typography variant="caption" color="success.main">
-            Recomendado
+          <Typography variant="caption" sx={{ color: rankingNumber > 0 ? "green" : rankingNumber < 0 ? "red" : "inherit" }}>
+            {rankingNumber > 0 ? "Recomendado" : rankingNumber === 0 ? "Variado o no votado" : "No Recomendado"}
           </Typography>
         )}
       </Box>

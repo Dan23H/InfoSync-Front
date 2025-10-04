@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getComments } from "../api/endpoints";
+import { getComments } from "../api";
 import type { Comment } from "../models";
 
 // Cuando el backend incluya post.commentsCount, este hook se puede eliminar.

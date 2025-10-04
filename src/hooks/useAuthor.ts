@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUserById } from "../api/endpoints";
+import { getUserById } from "../api";
 
 // cache simple en memoria para evitar llamadas repetidas
 const userCache: Record<string, any> = {};

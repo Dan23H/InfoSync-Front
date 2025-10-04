@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPosts, createPost } from "../api/endpoints";
+import { getPosts, createPost } from "../api";
 import type { Post, PostDto } from "../models";
 import { slugify } from "../utils/slugify";
 import { useAuth } from "../context/AuthContext";

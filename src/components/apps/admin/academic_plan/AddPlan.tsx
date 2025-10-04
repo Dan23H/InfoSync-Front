@@ -3,7 +3,7 @@ import { Box, Button, Typography, TextField, Select, MenuItem, FormControl, Inpu
 import CustomTextbox from "./CustomTextbox";
 import Selector from "./Selector";
 import type { Pensum, CourseDto } from "../../../../models";
-import { createPensum } from "../../../../api/endpoints";
+import { createPensum } from "../../../../api";
 import { usePensums } from "../../../../hooks/usePensums";
 import { useAuth } from "../../../../context/AuthContext";
 

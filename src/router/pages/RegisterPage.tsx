@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Paper, FormControl, InputLabel, Input, Button, MenuItem, Select, Typography } from "@mui/material";
-import { createUser } from "../../api/endpoints";
+import { createUser } from "../../api";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../../components/common/ErrorAlert";
 // Si tienes un logo, importa aquí:
