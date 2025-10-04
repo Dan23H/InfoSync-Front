@@ -71,13 +71,15 @@ export default function Navbar() {
               >
                 {isStudentView ? "Ir a vista administrador" : "Ir a vista estudiante"}
               </Button>
-              <Button color="inherit" onClick={() => navigate("/student")}>
-                {courseName ? `${pensum?.name} - ${courseName}` : "Home"}
-              </Button>
               {isStudentView && (
-                <Button color="inherit" onClick={handleNewPost}>
-                  <Typography>Crear publicación</Typography>
-                </Button>
+                <>
+                  <Button color="inherit" onClick={() => navigate("/student")}>
+                    {courseName ? `${pensum?.name} - ${courseName}` : "Home"}
+                  </Button>
+                  <Button color="inherit" onClick={handleNewPost}>
+                    <Typography>Crear publicación</Typography>
+                  </Button>
+                </>
               )}
             </>
           ) : (

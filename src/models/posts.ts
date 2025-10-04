@@ -9,12 +9,16 @@ export interface Post {
   course: string;
   images: string[];
   files: string[];
+  likeCount?: number;
+  dislikeCount?: number;
+  commentCount?: number;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface PostDto {
   userId: string;
+  pensumId: string;
   type: "Q" | "S";
   title: string;
   subject: string;

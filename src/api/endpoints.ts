@@ -100,55 +100,48 @@ export const getPostById = (id: string) =>
 export const createPost = (data: PostDto & { pensumId: string }) => {
   const url = `${BASE_URL}/post`;
 
-  const hasBinary =
-    (Array.isArray(data.images) && data.images.some((f: any) => f instanceof File)) ||
-    (Array.isArray(data.files) && data.files.some((f: any) => f instanceof File));
+  const fd = new FormData();
+  fd.append("userId", String(data.userId));
+  fd.append("pensumId", String(data.pensumId));
+  fd.append("type", String(data.type));
+  fd.append("title", String(data.title));
+  fd.append("subject", String(data.subject));
+  fd.append("description", String(data.description));
+  fd.append("course", String(data.course));
 
-  if (hasBinary) {
-    const fd = new FormData();
-    fd.append("userId", data.userId);
-    fd.append("pensumId", data.pensumId);
-    fd.append("type", data.type);
-    fd.append("title", data.title);
-    fd.append("subject", data.subject);
-    fd.append("description", data.description);
-    fd.append("course", data.course);
-    (data.images ?? []).forEach((f: any) => { if (f instanceof File) fd.append("images", f); });
-    (data.files ?? []).forEach((f: any) => { if (f instanceof File) fd.append("files", f); });
+  (data.images ?? []).forEach((f: any) => {
+    if (f instanceof File) fd.append("images", f);
+  });
+  (data.files ?? []).forEach((f: any) => {
+    if (f instanceof File) fd.append("files", f);
+  });
 
-    // Agrega el header Authorization explícitamente
-    const token = localStorage.getItem("jwt");
-    const headers: HeadersInit = {};
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+  // for (let pair of fd.entries()) {
+  //   console.log(pair[0], pair[1]); // Depuración comentada
+  // }
 
-    return request<Post>(url, { method: "POST", body: fd, headers });
+  const token = localStorage.getItem("jwt");
+  const headers: HeadersInit = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const payload = {
-    userId: data.userId,
-    pensumId: data.pensumId,
-    type: data.type,
-    title: data.title,
-    subject: data.subject,
-    description: data.description,
-    course: data.course,
-    images: Array.isArray(data.images) ? (data.images.filter((x): x is string => typeof x === "string")) : [],
-    files: Array.isArray(data.files) ? (data.files.filter((x): x is string => typeof x === "string")) : [],
-  };
-
-  return request<Post>(url, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  return request<Post>(url, { method: "POST", body: fd, headers });
 };
 
-export const updatePost = (id: string, data: Partial<PostDto>) =>
-  request<Post>(`${BASE_URL}/post/${id}`, {
+export const updatePost = (postId: string, post: PostDto) => {
+  const token = localStorage.getItem("jwt");
+  const headers: HeadersInit = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+    headers["Content-Type"] = "application/json";
+  }
+  return request<Post>(`${BASE_URL}/post/${postId}`, {
     method: "PATCH",
-    body: JSON.stringify(data),
+    body: JSON.stringify(post),
+    headers,
   });
+};
 
 export const deletePost = (id: string) =>
   request<void>(`${BASE_URL}/post/${id}`, {

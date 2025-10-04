@@ -16,7 +16,7 @@ export default function StudentLayout() {
       <ModalPost
         open={state.open}
         onClose={closeModal}
-        onSubmit={(data) => addPost(data, data.planId)}
+        onSubmit={(data) => addPost(data, data.pensumId)}
         courses={state.courses}
         initialData={state.initialData}
       />
