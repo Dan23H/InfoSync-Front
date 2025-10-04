@@ -7,25 +7,33 @@ import CommentItem from "./CommentItem";
 interface CommentsProps {
   postId: string;
   userId: string;
+  likeCount?: number;
+  dislikeCount?: number;
   onCommentCountChange?: (count: number) => void;
 }
 
-export default function CommentsSection({ postId, userId, onCommentCountChange }: CommentsProps) {
+export default function CommentsSection({ postId, userId, likeCount = 0, dislikeCount = 0, onCommentCountChange }: CommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
+  // Variables para contadores
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     (async () => {
       try {
         const data = await getComments(postId);
         setComments(data);
-        // Actualiza el contador al cargar comentarios
-        const total = data.reduce(
-          (acc, c) => acc + 1 + (c.subComments?.length || 0),
-          0
-        );
-        onCommentCountChange?.(total);
+          // Actualiza el contador al cargar comentarios
+          const total = data.reduce(
+            (acc, c) => acc + 1 + (c.subComments?.length || 0),
+            0
+          );
+          setCommentCount(total);
+          onCommentCountChange?.(total);
+          // Aquí podrías obtener los valores de likeCount y dislikeCount si los recibes del post
+          // setLikeCount(post.likeCount ?? 0);
+          // setDislikeCount(post.dislikeCount ?? 0);
       } catch (err) {
         console.error("Error cargando comentarios:", err);
       }
@@ -37,7 +45,8 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
       (acc, c) => acc + 1 + (c.subComments?.length || 0),
       0
     );
-    onCommentCountChange?.(total);
+      setCommentCount(total);
+      onCommentCountChange?.(total);
   };
 
   const handleAddComment = async () => {
@@ -78,6 +87,13 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
       <Typography variant="h6" gutterBottom>
         Comentarios
       </Typography>
+
+        {/* Debug/Visualización de contadores */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2">Comentarios: {commentCount}</Typography>
+          <Typography variant="body2">Likes: {likeCount}</Typography>
+          <Typography variant="body2">Dislikes: {dislikeCount}</Typography>
+        </Box>
 
       {/* Nuevo comentario */}
       <Box sx={{ display: "flex", gap: 1, mb: 2 }}>

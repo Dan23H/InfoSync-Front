@@ -12,6 +12,7 @@ interface PostContentProps {
 export default function PostContent({ post, onImageClick }: PostContentProps) {
   const { user: author, loading } = useAuthor(post.userId || null);
   const { user } = useAuth();
+  console.log("PostContent render with post:", post);
 
   return (
     <Card sx={{ backgroundColor: "#D9D9D9", p: 2 }}>
@@ -129,6 +130,8 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
       <CommentsSection
         postId={post._id}
         userId={user._id}
+        likeCount={post.likeCount}
+        dislikeCount={post.dislikeCount}
         onCommentCountChange={() => {}}
       />
     </Card>

@@ -31,3 +31,7 @@ export const deleteSubComment = (commentId: string, subCommentId: string) =>
     request<void>(`${BASE_URL}/comment/${commentId}/subcomment/${subCommentId}`, {
         method: "DELETE"
     });
+
+export const getCommentById = (id: string) =>
+    request<Comment>(`${BASE_URL}/comment/${id}`, { method: "GET" });
+

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography, FormControl, FormLabel, FormHelperText } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography, FormControl, FormHelperText, Divider } from "@mui/material";
 import { useAuth } from "../../../../context/AuthContext";
 import { usePlan } from "../../../../context/PlanContext";
 
@@ -23,8 +23,11 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
         description: initialData?.description || "",
         images: [] as File[],
         files: [] as File[],
+        commentCount: initialData?.commentCount || 0,
+        likeCount: initialData?.likeCount || 0,
+        dislikeCount: initialData?.dislikeCount || 0
     };
-    
+
     const [form, setForm] = useState(initialForm);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -105,7 +108,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     }, [open, initialData, courses]);
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: "100%" }} >
+        <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: "100%", userSelect: "none" }} >
             <DialogTitle>Subir publicación</DialogTitle>
             <DialogContent dividers sx={{ maxHeight: "60vh", overflowY: "auto" }}>
                 <Grid container spacing={2}>
@@ -152,21 +155,26 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                     </Grid>
 
                     {/* Tipo */}
-                    <Grid size={{ xs: 12 }}>
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                            <FormControl error={!!errors.type}>
-                                <FormLabel>Tipo</FormLabel>
+                    <Grid size={{ xs: 6 }} >
+                        <FormControl error={!!errors.type} sx={{ width: "100%" }}>
+                            <Box sx={{ display: "flex", alignItems: "center", width: "100%", mb: -0.5}}>
+                                <Divider sx={{ flex: 1, borderColor: "rgba(0, 0, 0, 0.15)", borderBottomWidth: 2 }} />
+                                <Typography sx={{ mx: 2, whiteSpace: "nowrap", color: "rgba(0, 0, 0, 0.5)", ":hover": { color: "rgba(0, 0, 0, 0.7)" } }}>Tipo</Typography>
+                                <Divider sx={{ flex: 1, borderColor: "rgba(0, 0, 0, 0.15)", borderBottomWidth: 2 }} />
+                            </Box>
+                            <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
                                 <RadioGroup
                                     row
                                     value={form.type}
                                     onChange={(_, v) => handleChange("type", v as "Q" | "S")}
+                                    sx={{ justifyContent: "center", width: "100%" }}
                                 >
-                                    <FormControlLabel value="Q" control={<Radio />} label="Pregunta (Q)" />
-                                    <FormControlLabel value="S" control={<Radio />} label="Solicitud (S)" />
+                                    <FormControlLabel value="Q" control={<Radio />} label="Pregunta" />
+                                    <FormControlLabel value="S" control={<Radio />} label="Sugerencia" />
                                 </RadioGroup>
-                                {!!errors.type && <FormHelperText>{errors.type}</FormHelperText>}
-                            </FormControl>
-                        </Box>
+                            </Box>
+                            {!!errors.type && <FormHelperText>{errors.type}</FormHelperText>}
+                        </FormControl>
                     </Grid>
 
                     {/* Descripción */}

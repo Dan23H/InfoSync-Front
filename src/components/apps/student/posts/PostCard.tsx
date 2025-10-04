@@ -18,6 +18,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const { user: author, loading } = useAuthor(post.userId);
 
@@ -134,14 +135,49 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         {/* Footer */}
         <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ userSelect: "none" }}>
               {commentsCount} – Comentarios
             </Typography>
-            <Typography variant="body2" sx={{ cursor: "pointer" }}>
-              Compartir
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+              {copied && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    position: "absolute",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    px: 1,
+                    py: 0.2,
+                    borderRadius: 1,
+                    color: "green",
+                    fontWeight: 500,
+                    fontSize: "0.7em",
+                    userSelect: "none",
+                    animation: "flyUp 0.5s cubic-bezier(.42,0,.58,1) forwards",
+                    "@keyframes flyUp": {
+                      from: { opacity: 0, top: 0 },
+                      to: { opacity: 1, top: -18 },
+                    }
+                  }}
+                >
+                  ¡Copiado!
+                </Typography>
+              )}
+              <Typography
+                variant="body2"
+                sx={{ cursor: "pointer", ":hover": { color: "darkblue" }, userSelect: "none" }}
+                onClick={() => {
+                  const url = `${window.location.origin}/student/${post.pensumId}/${slugify(post.course)}/${post._id}`;
+                  navigator.clipboard.writeText(url);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 4000);
+                }}
+              >
+                Compartir
+              </Typography>
+            </Box>
             {post.type === "S" && (
-              <Typography variant="body2" sx= {rankingNumber > 0 ? { color: "green" } : rankingNumber < 0 ? { color: "red" } : {}}>
+              <Typography variant="body2" sx={{ userSelect: "none", ...rankingNumber > 0 ? { color: "green" } : rankingNumber < 0 ? { color: "red" } : {} }}>
                 {rankingNumber > 0 ? "Recomendado" : rankingNumber === 0 ? "Variado o no votado" : "No Recomendado"}
               </Typography>
             )}
