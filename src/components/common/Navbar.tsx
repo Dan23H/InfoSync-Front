@@ -13,8 +13,8 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { openModal } = usePostModal();
   const { planId } = usePlan();
+  const { course } = useParams<{ plan?: string; course?: string }>();
   const { fetchPensumById } = usePensums();
-  const { course } = useParams<{ course?: string }>();
   const [pensum, setPensum] = useState<{ name: string } | null>(null);
 
   const [courseName, setCourseName] = useState<string | null>(null);

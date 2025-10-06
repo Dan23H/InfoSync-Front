@@ -46,6 +46,7 @@ export const updatePost = (id: string, data: Partial<PostDto>) => {
     });
     return request<Post>(url, { method: "PATCH", body: fd });
   }
+  console.log("Updating post with id:", id);  
   return request<Post>(url, {
     method: "PATCH",
     body: JSON.stringify(data),

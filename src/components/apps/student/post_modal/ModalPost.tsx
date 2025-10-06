@@ -92,6 +92,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
             images: form.images?.length ? form.images : [],
             files: form.files?.length ? form.files : []
         };
+        console.log("Submitting post:", payload);
 
         onSubmit(payload);
         onClose();
