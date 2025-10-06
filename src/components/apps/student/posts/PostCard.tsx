@@ -5,17 +5,16 @@ import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
 import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSelected, LikeUnselected } from "../../../../assets";
 import { useCommentsCount } from "../../../../hooks/useCounter";
-import { createReport, deletePost } from "../../../../api";
+import { createReport, deletePost, updatePost } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
+import ModalPost from "../post_modal/ModalPost";
 
 interface PostCardProps {
   post: Post;
   currentUserId?: string;
-  onEdit?: () => void;
-  onDelete?: () => void;
 }
 
-export default function PostCard({ post, currentUserId, onEdit, onDelete }: PostCardProps) {
+export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
@@ -29,6 +28,8 @@ export default function PostCard({ post, currentUserId, onEdit, onDelete }: Post
   const [reportReason, setReportReason] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const REPORT_REASONS = [
     "Inappropriate",
@@ -70,7 +71,6 @@ export default function PostCard({ post, currentUserId, onEdit, onDelete }: Post
     try {
       await deletePost(post._id, currentUserId || "");
       setDeleteDialogOpen(false);
-      if (onDelete) onDelete();
     } catch (err) {
       console.error("Error al borrar el post", err);
     }
@@ -134,8 +134,8 @@ export default function PostCard({ post, currentUserId, onEdit, onDelete }: Post
                 {canEditOrDelete && (
                   <MenuItem
                     onClick={() => {
+                      setEditModalOpen(true);
                       setAnchorEl(null);
-                      if (onEdit) onEdit();
                     }}
                   >
                     Editar
@@ -273,8 +273,8 @@ export default function PostCard({ post, currentUserId, onEdit, onDelete }: Post
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle color="error" textAlign={"center"} >
           ¿Estás seguro de que deseas borrar esta publicación?
-          </DialogTitle>
-          <Divider />
+        </DialogTitle>
+        <Divider />
         <DialogContent>
           <Typography variant="body1" textAlign={"center"}>
             El post se eliminará permanentemente y no podrá recuperarse de ninguna forma.
@@ -287,6 +287,18 @@ export default function PostCard({ post, currentUserId, onEdit, onDelete }: Post
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ModalPost
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSubmit={async (data) => {
+          await updatePost(post._id, data);
+          setEditModalOpen(false);
+          window.location.reload();
+        }}
+        initialData={post}
+        courses={[{ name: post.course, slug: "" }]} // O tu lista de cursos
+      />
 
       {/* Feedback */}
       <Snackbar

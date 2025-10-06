@@ -160,6 +160,9 @@ export default function Modding() {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {/* Filtro de reportes como chip dividido */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Typography variant="body1" sx={{ mr: 2, alignSelf: "center", userSelect: "none" }}>
+          Filtro:
+        </Typography>
         <Box sx={{
           display: "flex",
           borderRadius: 3,
@@ -167,6 +170,7 @@ export default function Modding() {
           boxShadow: 1,
           border: "1px solid #eee",
         }}>
+
           {FILTERS.map(f => (
             <Box
               key={f.value}
@@ -192,7 +196,7 @@ export default function Modding() {
 
       {/* Lista de reportes filtrados */}
       {filteredReports.length === 0 ? (
-        <Typography sx={{ textAlign: "center", mt: 4, color: "text.secondary" }}>
+        <Typography sx={{ textAlign: "center", mt: 4, color: "text.secondary", userSelect: "none"  }}>
           {filter === "Pending"
             ? "No hay reportes pendientes!"
             : "No hay reportes resueltos."}

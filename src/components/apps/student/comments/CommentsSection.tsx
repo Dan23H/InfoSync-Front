@@ -115,7 +115,7 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
         />
 
         {/* Usar imagen SVG en lugar de botón */}
-        <Button variant="contained" onClick={handleAddComment} disabled={loading}>
+        <Button variant="contained" color="error" onClick={handleAddComment} disabled={loading}>
           Comentar{/* <img src="/path/to/comment-icon.svg" alt="Comentar" /> */}
         </Button>
       </Box>
