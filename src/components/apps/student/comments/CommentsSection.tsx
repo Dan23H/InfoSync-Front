@@ -3,6 +3,7 @@ import { Box, Typography, Avatar, TextField, Button } from "@mui/material";
 import { getComments, createComment, createSubComment } from "../../../../api";
 import type { Comment } from "../../../../models";
 import CommentItem from "./CommentItem";
+import { useAuthor } from "../../../../hooks/useAuthor";
 
 interface CommentsProps {
   postId: string;
@@ -16,6 +17,7 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user: author, loading: _ } = useAuthor(userId || null);
   // Variables para contadores
   const [commentCount, setCommentCount] = useState(0);
 
@@ -97,7 +99,7 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
 
       {/* Nuevo comentario */}
       <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-        <Avatar>{userId[0]}</Avatar>
+        <Avatar>{author ? author.userName[0] : loading ? "..." : "?"}</Avatar>
         <TextField
           fullWidth
           size="small"

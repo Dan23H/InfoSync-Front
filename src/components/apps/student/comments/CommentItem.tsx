@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Box, Typography, Avatar, TextField, Divider, IconButton, Button } from "@mui/material";
+import { Box, Typography, Avatar, TextField, Divider, IconButton, Button, Snackbar, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
 import type { Comment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import SubCommentItem from "./SubcommentItem";
+import { createReport } from "../../../../api";
 
 interface CommentItemProps {
     comment: Comment;
@@ -14,19 +15,45 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
     const [replyText, setReplyText] = useState("");
     const [showSubcomments, setShowSubcomments] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
+    const [reportDialogOpen, setReportDialogOpen] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+    const REPORT_REASONS = [
+        "Inappropriate",
+        "Harassment",
+        "Offensive",
+        "Spam",
+        "Misleading",
+        "Copyright",
+        "Impersonation",
+        "Privacy",
+    ];
+
+    const handleReportSubmit = async () => {
+        await createReport({
+            userId: comment.userId, // O el usuario actual si lo tienes
+            targetType: "comment",
+            targetId: comment._id,
+            reason: reportReason,
+        });
+        setReportDialogOpen(false);
+        setReportReason("");
+        setSnackbarOpen(true);
+    };
 
     return (
         <Box sx={{ mb: 2, pl: 1 }}>
             {/* Encabezado del comentario */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Avatar>{author ? author.userName[0].toUpperCase() : loading ? "..." : "?"}</Avatar>
+                <Avatar>{author ? author.userName[0] : loading ? "..." : "?"}</Avatar>
                 <Typography variant="subtitle2">
                     {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                     {new Date(comment.createdAt).toLocaleString()}
                 </Typography>
-                <IconButton size="small" sx={{ ml: "auto" }}>Report</IconButton>
+                <IconButton size="small" sx={{ ml: "auto" }} onClick={() => setReportDialogOpen(true)}>Report</IconButton>
             </Box>
 
             {/* Texto del comentario */}
@@ -96,6 +123,39 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
                     </Button>
                 </Box>
             )}
+
+            <Dialog open={reportDialogOpen} onClose={() => setReportDialogOpen(false)}>
+                <DialogTitle>Reportar comentario</DialogTitle>
+                <DialogContent>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel id="report-reason-label">Motivo</InputLabel>
+                        <Select
+                            labelId="report-reason-label"
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                        >
+                            {REPORT_REASONS.map((reason) => (
+                                <MenuItem key={reason} value={reason}>
+                                    {reason}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setReportDialogOpen(false)}>Cancelar</Button>
+                    <Button onClick={handleReportSubmit} disabled={!reportReason}>
+                        Enviar
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                message="Reporte enviado correctamente"
+                onClose={() => setSnackbarOpen(false)}
+            />
 
             <Divider sx={{ mt: 1 }} />
         </Box>

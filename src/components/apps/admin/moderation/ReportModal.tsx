@@ -1,9 +1,9 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Box, Chip, Button, FormControlLabel, Checkbox, TextField, Stack, Divider } from "@mui/material";
 import PostCard from "../../student/posts/PostCard";
 import CommentItem from "../../student/comments/CommentItem";
-import SubCommentItem from "../../student/comments/SubcommentItem";
 import type { ReportModalProps } from "../../../../models";
 import { useNavigate } from "react-router-dom";
+import ReportedSubComment from "../../student/comments/ReportedSubComment";
 
 export default function ReportModal({
     open,
@@ -71,7 +71,7 @@ export default function ReportModal({
                                 <CommentItem comment={modalContent} onAddSubComment={() => { }} />
                             )}
                             {modalReport?.targetType === "subcomment" && (
-                                <SubCommentItem subComment={modalContent} />
+                                <ReportedSubComment subComment={modalContent} />
                             )}
                         </Box>
                         <Box sx={{

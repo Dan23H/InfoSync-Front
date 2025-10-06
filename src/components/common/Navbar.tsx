@@ -100,7 +100,7 @@ export default function Navbar() {
             src={user?.avatar || ""}
             alt={user?.userName || "Perfil"}
           >
-            {!user?.avatar && user?.userName ? user.userName[0].toUpperCase() : ""}
+            {!user?.avatar && user?.userName ? user.userName[0] : ""}
           </Avatar>
         </IconButton>
         <Menu

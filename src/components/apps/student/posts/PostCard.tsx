@@ -76,6 +76,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     }
   };
 
+  // Cálculo del ranking para sugerencias
   const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
   const rankingNumber = (post.likeCount ?? 0) / (totalVotes || 1);
 
@@ -164,7 +165,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", gap: 2 }}>
             <Typography variant="body2" sx={{ userSelect: "none" }}>
-              {commentsCount} – Comentarios - {post._id}
+              {commentsCount} – Comentarios
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
               {copied && (
@@ -210,35 +211,36 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               </Typography>
             )}
           </Box>
-
-          {/* Botones Like/Dislike para sugerencias */}
-          {post.type === "S" && (
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton
-                onClick={() => {
-                  setLiked(!liked);
-                  if (disliked) setDisliked(false);
-                }}
-              >
-                {liked ? <img src={LikeSelected} alt="like" width={22} height={22} /> : <img src={LikeUnselected} alt="like" width={22} height={22} />}
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  setDisliked(!disliked);
-                  if (liked) setLiked(false);
-                }}
-              >
-                {disliked ? <img src={DislikeSelected} alt="dislike" width={22} height={22} /> : <img src={DislikeUnselected} alt="dislike" width={22} height={22} />}
-              </IconButton>
-            </Box>
-          )}
-          <IconButton
-            onClick={() => {
-              setBookmarked(!bookmarked);
-            }}
-          >
-            {bookmarked ? <img src={BookmarkSVG} alt="bookmark" width={20} height={20} /> : <img src={AddBookmarkSVG} alt="bookmark" width={20} height={20} style={{ filter: "grayscale(100%)" }} />}
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Botones Like/Dislike para sugerencias */}
+            {post.type === "S" && (
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <IconButton
+                  onClick={() => {
+                    setLiked(!liked);
+                    if (disliked) setDisliked(false);
+                  }}
+                >
+                  {liked ? <img src={LikeSelected} alt="like" width={22} height={22} /> : <img src={LikeUnselected} alt="like" width={22} height={22} />}
+                </IconButton>
+                <IconButton
+                  onClick={() => {
+                    setDisliked(!disliked);
+                    if (liked) setLiked(false);
+                  }}
+                >
+                  {disliked ? <img src={DislikeSelected} alt="dislike" width={22} height={22} /> : <img src={DislikeUnselected} alt="dislike" width={22} height={22} />}
+                </IconButton>
+              </Box>
+            )}
+            <IconButton
+              onClick={() => {
+                setBookmarked(!bookmarked);
+              }}
+            >
+              {bookmarked ? <img src={BookmarkSVG} alt="bookmark" width={20} height={20} /> : <img src={AddBookmarkSVG} alt="bookmark" width={20} height={20} style={{ filter: "grayscale(100%)" }} />}
+            </IconButton>
+          </Box>
         </CardActions>
       </Card>
 

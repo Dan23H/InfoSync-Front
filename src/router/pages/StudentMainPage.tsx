@@ -26,12 +26,14 @@ export default function StudentMainPage() {
 
   useEffect(() => {
     if (data && data.length > 0) {
-      if (planId) {
-        setPlanSeleccionado(planId);
-      } else {
-        const defaultPlanId = data[data.length - 1]._id;
-        setPlanSeleccionado(defaultPlanId);
-        setPlanId(defaultPlanId);
+      if (!planSeleccionado) {
+        if (planId) {
+          setPlanSeleccionado(planId);
+        } else {
+          const defaultPlanId = data[data.length - 1]._id;
+          setPlanSeleccionado(defaultPlanId);
+          setPlanId(defaultPlanId);
+        }
       }
     }
   }, [data, planId, setPlanId, setPlanSeleccionado]);
@@ -43,7 +45,7 @@ export default function StudentMainPage() {
     actionLabel="Intentar de nuevo"
     onAction={() => error}
   />;
-
+  console.log(planSeleccionado)
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <PlanSelect

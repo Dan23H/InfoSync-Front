@@ -42,9 +42,9 @@ export default function ProfilePage() {
                             <Avatar
                                 src={user?.avatar || ""}
                                 alt={user?.userName || "Perfil"}
-                                sx={{ width: 100, height: 100 }}
+                                sx={{ width: 100, height: 100, fontSize: 40 }}
                             >
-                                {!user?.avatar && user?.userName ? user.userName[0].toUpperCase() : ""}
+                                {!user?.avatar && user?.userName ? user.userName[0] : ""}
                             </Avatar>
 
                             {/* Datos */}
