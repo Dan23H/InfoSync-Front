@@ -3,7 +3,7 @@ import { Box, Paper, FormControl, InputLabel, Input, Button, MenuItem, Select, T
 import { createUser } from "../../api";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../../components/common/ErrorAlert";
-// Si tienes un logo, importa aquí:
+// Si existe un logo, importar aquí:
 // import Logo from "../../assets/logo.png";
 
 export default function RegisterPage() {
@@ -59,7 +59,7 @@ export default function RegisterPage() {
             >
                 {/* Logo y título */}
                 {/* <img src={Logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} /> */}
-                <Typography variant="h5" fontWeight={700} color="primary" mb={2}>
+                <Typography variant="h5" fontWeight={700} color="red" mb={2}>
                     Registro
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={3} align="center">
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                     <Button
                         type="submit"
                         variant="contained"
-                        color="primary"
+                        color="error"
                         fullWidth
                         sx={{ mt: 2, py: 1.2, fontWeight: 600, fontSize: "1rem" }}
                         disabled={

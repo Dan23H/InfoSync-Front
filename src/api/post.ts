@@ -25,12 +25,7 @@ export const createPost = (data: PostDto & { pensumId: string }) => {
   (data.files ?? []).forEach((f: any) => {
     if (f instanceof File) fd.append("files", f);
   });
-  const token = localStorage.getItem("jwt");
-  const headers: HeadersInit = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  return request<Post>(url, { method: "POST", body: fd, headers });
+  return request<Post>(url, { method: "POST", body: fd });
 };
 
 export const updatePost = (id: string, data: Partial<PostDto>) => {
@@ -49,20 +44,16 @@ export const updatePost = (id: string, data: Partial<PostDto>) => {
         fd.append(key, value as string);
       }
     });
-    const token = localStorage.getItem("jwt");
-    const headers: HeadersInit = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    return request<Post>(url, { method: "PATCH", body: fd, headers });
+    return request<Post>(url, { method: "PATCH", body: fd });
   }
-  const token = localStorage.getItem("jwt");
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   return request<Post>(url, {
     method: "PATCH",
     body: JSON.stringify(data),
-    headers,
   });
 };
 
-export const deletePost = (id: string) =>
-  request<void>(`${BASE_URL}/post/${id}`, { method: "DELETE" });
+export const deletePost = (postId: string, userId: string) =>
+  request<void>(`${BASE_URL}/post/${postId}`, {
+    method: "DELETE",
+    body: JSON.stringify({ userId }),
+  });

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ErrorAlert from "../../components/common/ErrorAlert";
-// Si tienes un logo, importa aquí:
+// Existe un logo, importar aquí:
 // import Logo from "../../assets/logo.png";
 
 export default function LoginPage() {
@@ -51,7 +51,7 @@ export default function LoginPage() {
             >
                 {/* Logo y título */}
                 {/* <img src={Logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} /> */}
-                <Typography variant="h5" fontWeight={700} color="primary" mb={2}>
+                <Typography variant="h5" fontWeight={700} color="red" mb={2}>
                     Iniciar sesión
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={3} align="center">
@@ -88,7 +88,7 @@ export default function LoginPage() {
                     <Button
                         type="submit"
                         variant="contained"
-                        color="primary"
+                        color="error"
                         fullWidth
                         sx={{ mt: 2, py: 1.2, fontWeight: 600, fontSize: "1rem" }}
                         disabled={!email || !password}

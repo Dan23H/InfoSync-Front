@@ -10,12 +10,14 @@ interface PostSidebarProps {
 }
 
 export default function PostSidebar({ posts, postId, plan, course }: PostSidebarProps) {
+  const sameType = posts.find((p) => p._id === postId)?.type || "Q";
   return (
       <Card sx={{ height: "89vh", overflowY: "auto" }}>
         <CardContent>
           <List>
             {posts
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .filter((p) => p.type === sameType)
               .map((p) => (
                 <PostSidebarItem
                   key={p._id}

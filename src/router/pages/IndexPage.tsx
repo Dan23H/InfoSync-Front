@@ -16,10 +16,10 @@ export default function IndexPage() {
                         delaySpeed={2000}
                     />
                 </Typography>
-                <Button variant="contained" color="primary" href="/login" sx={{ mt: 4 }}>
+                <Button variant="contained" color="error" href="/login" sx={{ mt: 4 }}>
                     Get Started
                 </Button>
-                <Button variant="text" color="secondary" href="/register" sx={{ mt: 4, ml: 2 }}>
+                <Button variant="text" color="error" href="/register" sx={{ mt: 4, ml: 2 }}>
                     Register
                 </Button>
             </Grid>

@@ -20,6 +20,12 @@ export const updateUser = (id: string, data: { userName?: string; userEmail?: st
         body: JSON.stringify(data)
     });
 
+export const updateUserStatus = (id: string, status: string) =>
+    request<any>(`${BASE_URL}/user/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+    });
+
 export const deleteUser = (id: string) =>
     request<void>(`${BASE_URL}/user/${id}`, { method: "DELETE" });
 

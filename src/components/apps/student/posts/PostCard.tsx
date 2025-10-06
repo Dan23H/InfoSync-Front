@@ -8,6 +8,14 @@ import { useCommentsCount } from "../../../../hooks/useCounter";
 import { createReport } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
 
+/* Cambiar el color del login y registro a rojo, Ajustar los reportes para que 
+se seleccione los pasos a seguir, hacer un botón para volver a los reportes (si 
+fue redirigido desde ahí), ajustar la sección de comentarios (utilizar el nuevo
+endpoint para extraer la cantidad de comentarios), ajustar la fórmula para clasificar
+las sugerencias partiendo de 25 votos, añadir los botones de like y dislike al
+contenido de la publicación de tipo sugerencia y añadir el botón de Useful para
+los comentarios (no subcomentarios). */
+
 interface PostCardProps {
   post: Post;
   currentUserId?: string;
@@ -64,7 +72,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     }
   };
 
-  const rankingNumber = (post.likeCount ?? 0) - (post.dislikeCount ?? 0)
+  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
+  const rankingNumber = (post.likeCount ?? 0) / (totalVotes || 1);
 
   return (
     <>
@@ -178,7 +187,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             </Box>
             {post.type === "S" && (
               <Typography variant="body2" sx={{ userSelect: "none", ...rankingNumber > 0 ? { color: "green" } : rankingNumber < 0 ? { color: "red" } : {} }}>
-                {rankingNumber > 0 ? "Recomendado" : rankingNumber === 0 ? "Variado o no votado" : "No Recomendado"}
+                {totalVotes > 25 ? (rankingNumber > 0.66 ? "Muy Recomendado" : rankingNumber > 0.33 ? "Recomendado" : rankingNumber > 0 ? "Poco Recomendado" : "No Recomendado") : ""}
               </Typography>
             )}
           </Box>

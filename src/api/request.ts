@@ -5,7 +5,10 @@ export async function request<T>(url: string, options?: RequestInit): Promise<T>
   if (token && !isRegister) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  if (options?.body && !(options.body instanceof FormData)) {
+  if (
+    options?.body &&
+    !(options.body instanceof FormData)
+  ) {
     headers["Content-Type"] = "application/json";
   }
   const res = await fetch(url, {
@@ -19,5 +22,6 @@ export async function request<T>(url: string, options?: RequestInit): Promise<T>
     const msg = await res.text().catch(() => "");
     throw new Error(`${res.status} ${res.statusText} ${msg}`.trim());
   }
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : (undefined as T);
 }

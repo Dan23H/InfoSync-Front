@@ -93,9 +93,6 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
             files: form.files?.length ? form.files : []
         };
 
-        console.log("Payload a enviar:", payload);
-        console.log("JSON.stringify(payload):", JSON.stringify(payload));
-
         onSubmit(payload);
         onClose();
     };

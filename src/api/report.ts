@@ -14,11 +14,11 @@ export const createReport = (data: { userId: string; targetType: string; targetI
 export const getReport = (id: string) =>
     request<any>(`${BASE_URL}/report/${id}`, { method: "GET" });
 
-export const resolveReport = (id: string, data: { reason: string, state: string, reviewedBy: string, reviewDescription: string, resolveAt: string }) =>
+export const resolveReport = (id: string, data: { userId: string, state: string, reviewDescription: string }) =>
     request<any>(`${BASE_URL}/report/${id}`, {
         method: "PATCH",
         body: JSON.stringify(data)
     });
 
-export const deleteReport = (id: string) =>
-    request<void>(`${BASE_URL}/report/${id}`, { method: "DELETE" });
+export const deleteReport = (id: string, userId: string) =>
+    request<void>(`${BASE_URL}/report/${id}`, { method: "DELETE", body: JSON.stringify({ userId }) });
