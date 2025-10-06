@@ -30,27 +30,18 @@ export const createPost = (data: PostDto & { pensumId: string }) => {
 
 export const updatePost = (id: string, data: Partial<PostDto>) => {
   const url = `${BASE_URL}/post/${id}`;
-  const hasBinary =
-    (Array.isArray(data.images) && data.images.some(f => f instanceof File)) ||
-    (Array.isArray(data.files) && data.files.some(f => f instanceof File));
-  if (hasBinary) {
-    const fd = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach(v => {
-          if (v instanceof File) fd.append(key, v);
-        });
-      } else if (value !== undefined) {
-        fd.append(key, value as string);
-      }
-    });
-    return request<Post>(url, { method: "PATCH", body: fd });
-  }
-  console.log("Updating post with id:", id);  
-  return request<Post>(url, {
-    method: "PATCH",
-    body: JSON.stringify(data),
+  const fd = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach(v => {
+        if (v instanceof File) fd.append(key, v);
+        else fd.append(key, v);
+      });
+    } else if (value !== undefined && value !== null) {
+      fd.append(key, value as string);
+    }
   });
+  return request<Post>(url, { method: "PATCH", body: fd });
 };
 
 export const deletePost = (postId: string, userId: string) =>
