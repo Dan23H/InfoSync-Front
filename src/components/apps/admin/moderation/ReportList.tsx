@@ -51,9 +51,18 @@ export default function ReportList({ reports, authors, filter, onView, onDelete 
                                 ))}
                             </Box>
                             {r.course && (
-                                <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
-                                    Curso: <b>{r.course}</b>
-                                </Typography>
+                                <Box sx={{ mt: 1 }}>
+                                    <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
+                                        Curso: <b>{r.course}</b>
+                                    </Typography>
+                                </Box>
+                            )}
+                            {r.state === "Resolved" && (
+                                <Box sx={{ mt: 1 }}>
+                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                        Descripción: {r.reviewDescription || "N/A"}
+                                    </Typography>
+                                </Box>
                             )}
                             <Box
                                 sx={{
@@ -100,7 +109,7 @@ export default function ReportList({ reports, authors, filter, onView, onDelete 
                                     <span>
                                         <Button
                                             variant="outlined"
-                                            
+
                                             size="small"
                                             startIcon={<img src={DeleteSVG} alt="delete" style={{ width: 16, height: 16 }} />}
                                             onClick={() => onDelete(r._id, r.userId)}
