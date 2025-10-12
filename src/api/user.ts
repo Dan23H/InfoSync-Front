@@ -14,11 +14,14 @@ export const getUsers = () =>
 export const getUserById = (id: string) =>
     request<any>(`${BASE_URL}/user/${id}`, { method: "GET" });
 
-export const updateUser = (id: string, data: { userName?: string; userEmail?: string; role?: string }) =>
-    request<any>(`${BASE_URL}/user/${id}`, {
+export const updateUser = (id: string, data: { userName?: string; userEmail?: string; role?: string }) => {
+    console.log("Updating user:", id, data);
+    const url = `${BASE_URL}/user/${id}`;
+    return request<any>(url, {
         method: "PATCH",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     });
+};
 
 export const updateUserStatus = (id: string, status: string) =>
     request<any>(`${BASE_URL}/user/${id}/status`, {

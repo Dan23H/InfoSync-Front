@@ -7,7 +7,7 @@ import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSe
 import { useCommentsCount } from "../../../../hooks/useCounter";
 import { createReport, deletePost, updatePost } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
-import ModalPost from "../post_modal/ModalPost";
+import ModalPost from "./ModalPost";
 
 interface PostCardProps {
   post: Post;

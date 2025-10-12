@@ -22,15 +22,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedToken = localStorage.getItem("jwt");
     const storedUser = localStorage.getItem("user");
     if (storedToken) setToken(storedToken);
-    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      const normalized = { ...parsed, userId: (parsed.userId ?? parsed._id), _id: (parsed._id ?? parsed.userId) };
+      setUser(normalized);
+    }
     setLoading(false);
   }, []);
 
   const handleLogin = (token: string, user: User) => {
+    // Normalize user shape: some components expect user._id, others user.userId
+    const normalizedUser = { ...user, userId: (user.userId ?? user._id), _id: (user._id ?? user.userId) };
     setToken(token);
-    setUser(user);
+    setUser(normalizedUser);
     localStorage.setItem("jwt", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
   };
 
   const handleLogout = () => {

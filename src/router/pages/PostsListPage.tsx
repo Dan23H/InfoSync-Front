@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
 import { useEffect, useState } from "react";
@@ -13,7 +13,17 @@ export default function PostsListPage() {
   const { user } = useAuth();
   const plan = planId ?? planFromUrl;
 
-  const { data: posts, loading: postsLoading, error: postsError } = usePosts(plan, course);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const q = params.get("q")?.trim().toLowerCase() || "";
+
+  const { data: postsRaw, loading: postsLoading, error: postsError } = usePosts(plan, course); // Revisar
+  const posts = postsRaw?.filter((p: any) => {
+    if (!q) return true;
+    const inTitle = p.title?.toLowerCase().includes(q);
+    const inSubject = p.subject?.toLowerCase().includes(q);
+    return Boolean(inTitle || inSubject);
+  }) ?? [];
   const { fetchPensumById } = usePensums();
   const [pensum, setPensum] = useState<any>(null);
   const [pensumLoading, setPensumLoading] = useState(true);

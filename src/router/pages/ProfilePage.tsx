@@ -3,12 +3,14 @@ import { Box, Card, CardContent, Typography, Button, Grid, IconButton, Divider, 
 import { useAuth } from "../../context/AuthContext"; // ajusta la ruta según tu proyecto
 import { EditSVG } from "../../assets";
 import { useMatch, useNavigate } from "react-router-dom";
+import { updateUser } from "../../api";
 
 export default function ProfilePage() {
     const { user } = useAuth();
     // user = { userId, userEmail, userName, password, role, status }
 
     const [showEmail, setShowEmail] = useState(false);
+    const [editName, setEditName] = useState(user?.userName || "");
     const navigate = useNavigate();
     const isEditing = useMatch("/student/profile/edit");
 
@@ -17,6 +19,16 @@ export default function ProfilePage() {
         const [name, domain] = email.split("@");
         const hidden = name.length > 3 ? name.slice(0, 3) + "******" : "******";
         return `${hidden}@${domain}`;
+    };
+
+    const handleEditProfile = async () => {
+        try {
+            await updateUser(user._id, { userEmail: user?.userEmail, userName: editName });
+            alert("Perfil actualizado con éxito.");
+            navigate("/student/profile");
+        } catch (err) {
+            console.error("Error actualizando perfil:", err);
+        }
     };
 
     return (
@@ -56,6 +68,7 @@ export default function ProfilePage() {
                                                 label="Nombre"
                                                 defaultValue={user?.userName}
                                                 sx={{ mb: 2, width: "75%" }}
+                                                onChange={(e) => setEditName(e.target.value)}
                                             />
                                         </Grid>
                                         <Grid display="flex" justifyContent="center" sx={{ width: "100%" }}>
@@ -63,7 +76,7 @@ export default function ProfilePage() {
                                                 variant="contained"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    navigate("/student/profile");
+                                                    handleEditProfile();
                                                 }}
                                             >
                                                 Guardar cambios

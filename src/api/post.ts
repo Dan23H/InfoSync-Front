@@ -19,6 +19,9 @@ export const createPost = (data: PostDto & { pensumId: string }) => {
   fd.append("subject", String(data.subject));
   fd.append("description", String(data.description));
   fd.append("course", String(data.course));
+  fd.append("likeCount", "0");
+  fd.append("dislikeCount", "0");
+  fd.append("commentCount", "0");
   (data.images ?? []).forEach((f: any) => {
     if (f instanceof File) fd.append("images", f);
   });

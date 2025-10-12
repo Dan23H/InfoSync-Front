@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Button, Box, Typography, Menu, MenuItem, Avatar, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Button, Box, Typography, Menu, MenuItem, Avatar, IconButton, TextField, InputAdornment } from "@mui/material";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { usePostModal } from "../../context/PostModalContext";
@@ -23,6 +23,8 @@ export default function Navbar() {
 
   const isAdmin = user?.role === "admin";
   const isStudentView = location.pathname.startsWith("/student");
+  const isProfileRoute = location.pathname.includes("/profile");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!planId || !course) {
@@ -76,9 +78,11 @@ export default function Navbar() {
                   <Button color="inherit" onClick={() => navigate("/student")}>
                     {courseName ? `${pensum?.name} - ${courseName}` : "Home"}
                   </Button>
-                  <Button color="inherit" onClick={handleNewPost}>
-                    <Typography>Crear publicación</Typography>
-                  </Button>
+                  {!isProfileRoute && (
+                    <Button color="inherit" onClick={handleNewPost}>
+                      <Typography>Crear publicación</Typography>
+                    </Button>
+                  )}
                 </>
               )}
             </>
@@ -87,11 +91,38 @@ export default function Navbar() {
               <Button color="inherit" onClick={() => navigate("/student")}>
                 {courseName ? `Ingeniería Informática - ${courseName}` : "Home"}
               </Button>
-              <Button color="inherit" onClick={handleNewPost}>
-                <Typography>Crear publicación</Typography>
-              </Button>
+              {!isProfileRoute && (
+                <Button color="inherit" onClick={handleNewPost}>
+                  <Typography>Crear publicación</Typography>
+                </Button>
+              )}
             </>
           )}
+          {/* Search box - temporal */}
+          <TextField
+            size="small"
+            placeholder="Buscar posts..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`);
+              }
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    color="inherit"
+                    onClick={() => navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`)}
+                  >
+                    Buscar
+                  </Button>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ ml: 2, width: 260 }}
+          />
         </Box>
 
         {/* Avatar y menú */}

@@ -6,7 +6,7 @@ import { useAuth } from "../../../../context";
 import { useState } from "react";
 import { createReport, deletePost } from "../../../../api";
 import { useNavigate } from "react-router-dom";
-import ModalPost from "../post_modal/ModalPost";
+import ModalPost from "./ModalPost";
 import { updatePost } from "../../../../api/post";
 
 interface PostContentProps {

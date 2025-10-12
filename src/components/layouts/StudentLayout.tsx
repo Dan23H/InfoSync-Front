@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { usePostModal } from "../../context/PostModalContext"; 
-import ModalPost from "../apps/student/post_modal/ModalPost"; 
+import ModalPost from "../apps/student/posts/ModalPost"; 
 import { usePosts } from "../../hooks/usePosts"; 
 import Navbar from "../common/Navbar";
 

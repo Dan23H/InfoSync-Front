@@ -26,4 +26,7 @@ export interface PostDto {
   course: string;
   images?: (string | File)[];
   files?: (string | File)[];
+  likeCount?: number;
+  dislikeCount?: number;
+  commentCount?: number;
 }
