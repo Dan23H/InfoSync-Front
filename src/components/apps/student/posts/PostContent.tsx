@@ -3,11 +3,11 @@ import CommentsSection from "../comments/CommentsSection";
 import type { Post } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useAuth } from "../../../../context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createReport, deletePost } from "../../../../api";
 import { useNavigate } from "react-router-dom";
 import ModalPost from "./ModalPost";
-import { updatePost } from "../../../../api/post";
+import { updateDislike, updateLike, updatePost } from "../../../../api/post";
 
 interface PostContentProps {
   post: Post;
@@ -23,10 +23,19 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
+  const [localLikeCount, setLocalLikeCount] = useState<number>(post.likeCount ?? 0);
+  const [localDislikeCount, setLocalDislikeCount] = useState<number>(post.dislikeCount ?? 0);
   const open = Boolean(anchorEl);
   const urlActual = window.location.pathname;
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
   const navigate = useNavigate();
+
+  // Sync local counters when post updates from props (e.g., via sockets)
+  useEffect(() => {
+    setLocalLikeCount(post.likeCount ?? 0);
+    setLocalDislikeCount(post.dislikeCount ?? 0);
+  }, [post.likeCount, post.dislikeCount]);
 
   const REPORT_REASONS = [
     "Inappropriate",
@@ -60,6 +69,42 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
     setDeleteDialogOpen(false);
     navigate(urlVolver)
     // Puedes redirigir o actualizar la vista aquí si lo necesitas
+  };
+
+  const handleLike = async () => {
+    if (isVoting) return;
+    setIsVoting(true);
+    const previousLike = localLikeCount;
+    // optimistic
+    setLocalLikeCount((c) => c + 1);
+    try {
+      const updated = await updateLike(post._id);
+      setLocalLikeCount(updated.likeCount ?? updated.likeCount ?? 0);
+      setLocalDislikeCount(updated.dislikeCount ?? updated.dislikeCount ?? 0);
+    } catch (err) {
+      // revert
+      setLocalLikeCount(previousLike);
+      console.error("Error liking post:", err);
+    } finally {
+      setIsVoting(false);
+    }
+  };
+
+  const handleDislike = async () => {
+    if (isVoting) return;
+    setIsVoting(true);
+    const previousDislike = localDislikeCount;
+    setLocalDislikeCount((c) => c + 1);
+    try {
+      const updated = await updateDislike(post._id);
+      setLocalLikeCount(updated.likeCount ?? updated.likeCount ?? 0);
+      setLocalDislikeCount(updated.dislikeCount ?? updated.dislikeCount ?? 0);
+    } catch (err) {
+      setLocalDislikeCount(previousDislike);
+      console.error("Error disliking post:", err);
+    } finally {
+      setIsVoting(false);
+    }
   };
 
   return (
@@ -235,6 +280,10 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
             </Box>
           </>
         )}
+
+        <Divider sx={{ my: 2 }} />
+        <Button disabled={isVoting} onClick={(e) => { e.preventDefault(); handleLike(); }}>Like ({localLikeCount})</Button>
+        <Button disabled={isVoting} onClick={(e) => { e.preventDefault(); handleDislike(); }}>Dislike ({localDislikeCount})</Button>
       </CardContent>
 
       {/* Comentarios */}

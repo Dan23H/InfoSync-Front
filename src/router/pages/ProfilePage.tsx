@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
     const handleEditProfile = async () => {
         try {
-            await updateUser(user._id, { userEmail: user?.userEmail, userName: editName });
+            await updateUser(user._id, { userName: editName });
             alert("Perfil actualizado con éxito.");
             navigate("/student/profile");
         } catch (err) {
