@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Post } from "../../../../models";
 import { useCommentsCount } from "../../../../hooks/useCounter";
 import { useAuthor } from "../../../../hooks/useAuthor";
+import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
 
 interface PostSidebarItemProps {
   post: Post;
@@ -14,7 +15,12 @@ interface PostSidebarItemProps {
 export default function PostSidebarItem({ post, plan, course, isActive }: PostSidebarItemProps) {
   const { user: author, loading } = useAuthor(post.userId || null);
   const commentsCount = useCommentsCount(post._id || "0");
-  const rankingNumber = (post.likeCount ?? 0) - (post.dislikeCount ?? 0)
+  const score = useWilsonScore(post.likeCount ?? 0, post.dislikeCount ?? 0);
+  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
+  const recommendation = getRecommendationLabel(score, totalVotes);
+  const recommendationLabel = recommendation.label;
+  const recommendationColor = recommendation.color;
+
   return (
     <ListItem
       key={post._id}
@@ -59,8 +65,8 @@ export default function PostSidebarItem({ post, plan, course, isActive }: PostSi
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5 }}>
         <Typography variant="caption">{commentsCount} comentarios</Typography>
         {post.type === "S" && (
-          <Typography variant="caption" sx={{ color: rankingNumber > 0 ? "green" : rankingNumber < 0 ? "red" : "inherit" }}>
-            {rankingNumber > 0 ? "Recomendado" : rankingNumber === 0 ? "Variado o no votado" : "No Recomendado"}
+          <Typography variant="caption" sx={{color: recommendationColor}}>
+            {recommendationLabel}
           </Typography>
         )}
       </Box>

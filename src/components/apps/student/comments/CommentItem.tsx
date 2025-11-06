@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Typography, Avatar, TextField, Divider, IconButton, Button, Snackbar, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
 import type { Comment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import SubCommentItem from "./SubcommentItem";
 import { createReport } from "../../../../api";
-import { useSocket } from "../../../../context/SocketContext";
 
 interface CommentItemProps {
     comment: Comment;
@@ -19,7 +18,6 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
     const [reportDialogOpen, setReportDialogOpen] = useState(false);
     const [reportReason, setReportReason] = useState("");
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const { onEvent, emitEvent } = useSocket();
 
     const REPORT_REASONS = [
         "Inappropriate",
@@ -31,22 +29,6 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
         "Impersonation",
         "Privacy",
     ];
-
-    useEffect(() => {
-        const handleCommentUpdate = (updatedComment: Comment) => {
-            if (updatedComment._id === comment._id) {
-                // Actualizar el estado local o forzar un re-render
-                window.location.reload();
-            }
-        };
-
-        onEvent("comment-updated", handleCommentUpdate);
-
-        return () => {
-            // Cleanup
-            onEvent("comment-updated", () => {});
-        };
-    }, [comment._id, onEvent]);
 
     const handleReportSubmit = async () => {
         await createReport({
@@ -62,7 +44,6 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
 
     const handleAddSubComment = (commentId: string, text: string) => {
         onAddSubComment(commentId, text);
-        emitEvent("subcomment-added", { commentId, text });
     };
 
     return (

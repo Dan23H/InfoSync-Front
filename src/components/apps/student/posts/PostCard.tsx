@@ -1,5 +1,5 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, Select, Divider } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Post } from "../../../../models";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
@@ -8,7 +8,7 @@ import { useCommentsCount } from "../../../../hooks/useCounter";
 import { createReport, deletePost, updatePost } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import ModalPost from "./ModalPost";
-import { useSocket } from "../../../../context/SocketContext";
+import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
 
 interface PostCardProps {
   post: Post;
@@ -23,9 +23,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [copied, setCopied] = useState(false);
 
   const { user: author, loading } = useAuthor(post.userId);
-  const { onEvent, emitEvent } = useSocket();
 
-  // Estado del diálogo de reporte
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -45,29 +43,17 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   ];
 
   const commentsCount = useCommentsCount(post._id);
+  const score = useWilsonScore(post.likeCount ?? 0, post.dislikeCount ?? 0);
+  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
+  const recommendation = getRecommendationLabel(score, totalVotes);
+  const recommendationLabel = recommendation.label;
+  const recommendationColor = recommendation.color;
 
   const open = Boolean(anchorEl);
 
-  // validación editar/borrar: mismo user y < 2 horas
   const canEditOrDelete =
     post.userId === currentUserId &&
     Date.now() - new Date(post.createdAt).getTime() < 2 * 60 * 60 * 1000;
-
-  useEffect(() => {
-    const handlePostUpdate = (updatedPost: Post) => {
-      if (updatedPost._id === post._id) {
-        // Actualizar el estado local o forzar un re-render
-        window.location.reload();
-      }
-    };
-
-    onEvent("post-updated", handlePostUpdate);
-
-    return () => {
-      // Cleanup
-      onEvent("post-updated", () => {});
-    };
-  }, [post._id, onEvent]);
 
   const handleReportSubmit = async () => {
     try {
@@ -88,7 +74,6 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const handleDeletePost = async () => {
     try {
       await deletePost(post._id, currentUserId || "");
-      emitEvent("post-deleted", { postId: post._id });
       setDeleteDialogOpen(false);
     } catch (err) {
       console.error("Error al borrar el post", err);
@@ -98,16 +83,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const handleEditPost = async (data: any) => {
     try {
       await updatePost(post._id, data);
-      emitEvent("post-updated", { ...post, ...data });
       setEditModalOpen(false);
+      window.location.reload();
     } catch (err) {
       console.error("Error al editar el post", err);
     }
   };
-
-  // Cálculo del ranking para sugerencias
-  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
-  const rankingNumber = (post.likeCount ?? 0) / (totalVotes || 1);
 
   return (
     <>
@@ -231,12 +212,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   setTimeout(() => setCopied(false), 4000);
                 }}
               >
-                Compartir
+                Copiar URL
               </Typography>
             </Box>
             {post.type === "S" && (
-              <Typography variant="body2" sx={{ userSelect: "none", ...rankingNumber > 0 ? { color: "green" } : rankingNumber < 0 ? { color: "red" } : {} }}>
-                {totalVotes > 25 ? (rankingNumber > 0.66 ? "Muy Recomendado" : rankingNumber > 0.33 ? "Recomendado" : rankingNumber > 0 ? "Poco Recomendado" : "No Recomendado") : ""}
+              <Typography variant="body2" sx={{ userSelect: "none", color: recommendationColor }}>
+                {recommendationLabel}
               </Typography>
             )}
           </Box>

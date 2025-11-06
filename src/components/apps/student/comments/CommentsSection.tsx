@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, Typography, Avatar, TextField, Button } from "@mui/material";
 import { getComments, createComment, createSubComment } from "../../../../api";
 import type { Comment } from "../../../../models";
 import CommentItem from "./CommentItem";
 import { useAuthor } from "../../../../hooks/useAuthor";
+import SocketContext from "../../../../context/SocketContext";
 
 interface CommentsProps {
   postId: string;
@@ -13,12 +14,12 @@ interface CommentsProps {
   onCommentCountChange?: (count: number) => void;
 }
 
-export default function CommentsSection({ postId, userId, likeCount = 0, dislikeCount = 0, onCommentCountChange }: CommentsProps) {
+export default function CommentsSection({ postId, userId, onCommentCountChange }: CommentsProps) {
+  const { SocketState } = useContext(SocketContext);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const { user: author, loading: _ } = useAuthor(userId || null);
-  // Variables para contadores
   const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
@@ -26,29 +27,58 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
       try {
         const data = await getComments(postId);
         setComments(data);
-          // Actualiza el contador al cargar comentarios
-          const total = data.reduce(
-            (acc, c) => acc + 1 + (c.subComments?.length || 0),
-            0
-          );
-          setCommentCount(total);
-          onCommentCountChange?.(total);
-          // Aquí podrías obtener los valores de likeCount y dislikeCount si los recibes del post
-          // setLikeCount(post.likeCount ?? 0);
-          // setDislikeCount(post.dislikeCount ?? 0);
+        const total = data.reduce(
+          (acc, c) => acc + 1 + (c.subComments?.length || 0),
+          0
+        );
+        setCommentCount(total);
+        onCommentCountChange?.(total);
       } catch (err) {
         console.error("Error cargando comentarios:", err);
       }
     })();
-  }, [postId]);
+    console.log("Updated comment count:", commentCount);
+  }, [postId, SocketState.socket]);
+
+  useEffect(() => {
+    if (!SocketState.socket) return;
+
+    const handleCommentAdded = (comment: Comment) => {
+      console.log("New comment added:", comment);
+      setComments((prev) => {
+        const updated = [comment, ...prev];
+        updateCommentCount(updated);
+        return updated;
+      });
+    };
+
+    const handleCommentUpdated = (updatedComment: Comment) => {
+      console.log("Comment updated:", updatedComment);
+      setComments((prev) => {
+        const updated = prev.map((c) => (c._id === updatedComment._id ? updatedComment : c));
+        updateCommentCount(updated);
+        return updated;
+      });
+    };
+
+    SocketState.socket.on("comment_added", handleCommentAdded);
+    SocketState.socket.on("comment_updated", handleCommentUpdated);
+
+    return () => {
+      if (SocketState.socket) {
+        SocketState.socket.off("comment_added", handleCommentAdded);
+        SocketState.socket.off("comment_updated", handleCommentUpdated);
+      }
+    };
+  }, [SocketState.socket]);
 
   const updateCommentCount = (commentsList: Comment[]) => {
     const total = commentsList.reduce(
       (acc, c) => acc + 1 + (c.subComments?.length || 0),
       0
     );
-      setCommentCount(total);
-      onCommentCountChange?.(total);
+    setCommentCount(total);
+    onCommentCountChange?.(total);
   };
 
   const handleAddComment = async () => {
@@ -90,13 +120,6 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
         Comentarios
       </Typography>
 
-        {/* Debug/Visualización de contadores */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2">Comentarios: {commentCount}</Typography>
-          <Typography variant="body2">Likes: {likeCount}</Typography>
-          <Typography variant="body2">Dislikes: {dislikeCount}</Typography>
-        </Box>
-
       {/* Nuevo comentario */}
       <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
         <Avatar>{author ? author.userName[0] : loading ? "..." : "?"}</Avatar>
@@ -108,17 +131,14 @@ export default function CommentsSection({ postId, userId, likeCount = 0, dislike
           onChange={(e) => setNewComment(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && newComment.trim()) {
-              // Para evitar que se envíe el subcomentario y el comentario al mismo tiempo
               e.preventDefault();
               e.stopPropagation();
               handleAddComment();
             }
           }}
         />
-
-        {/* Usar imagen SVG en lugar de botón */}
         <Button variant="contained" color="error" onClick={handleAddComment} disabled={loading}>
-          Comentar{/* <img src="/path/to/comment-icon.svg" alt="Comentar" /> */}
+          Comentar
         </Button>
       </Box>
 

@@ -1,11 +1,16 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid, Fab } from "@mui/material";
 import PostCard from "../../components/apps/student/posts/PostCard";
 import { usePlan } from "../../context/PlanContext";
 import { useAuth } from "../../context/AuthContext";
+import { useSocket } from "../../hooks/useSocket";
+import SocketContext from "../../context/SocketContext";
+import { AiFillEye, AiFillEyeInvisible, AiFillHome } from "react-icons/ai";
+
+const WSS_API_URL = "ws://localhost:3000";
 
 export default function PostsListPage() {
   const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
@@ -33,6 +38,29 @@ export default function PostsListPage() {
   const [showSuggestions, setShowSuggestions] = useState(true);
 
   const navigate = useNavigate();
+  const { SocketDispatch } = useContext(SocketContext);
+  const socket = useSocket(WSS_API_URL, {
+    autoConnect: false,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 5000,
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    const user = localStorage.getItem("user");
+
+    if (token && user) {
+      socket.io.opts.query = { token, user };
+      socket.connect();
+      SocketDispatch({ type: "update_socket", payload: socket });
+    } else {
+      console.error("Missing token or user in localStorage. Socket will not connect.");
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket, SocketDispatch]);
 
   useEffect(() => {
     if (!plan) return;
@@ -48,8 +76,10 @@ export default function PostsListPage() {
   if (pensumError) return <Typography color="error">{pensumError}</Typography>;
   if (!pensum) return <Typography>No se encontró el plan académico.</Typography>;
 
-  const questions = posts?.filter((p) => p.type === "Q") ?? [];
-  const suggestions = posts?.filter((p) => p.type === "S") ?? [];
+  const sortedPosts = posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const questions = sortedPosts?.filter((p) => p.type === "Q") ?? [];
+  const suggestions = sortedPosts?.filter((p) => p.type === "S") ?? [];
 
   const openedCount = [showQuestions, showSuggestions].filter(Boolean).length;
   const gridSize = openedCount === 2 ? 6 : 12;
@@ -63,7 +93,7 @@ export default function PostsListPage() {
           onClick={() => navigate("/student")}
           sx={{ position: "fixed", bottom: 16, left: 16 }}
         >
-          {"<"}
+          {<AiFillHome />}
         </Fab>
 
         {/* Preguntas */}
@@ -75,7 +105,7 @@ export default function PostsListPage() {
               sx={{ ":hover": { cursor: "pointer" } }}
               action={
                 <IconButton>
-                  {showQuestions ? "^" : "v"}
+                  {showQuestions ? <AiFillEyeInvisible /> : <AiFillEye />}
                 </IconButton>
               }
             />
@@ -100,7 +130,7 @@ export default function PostsListPage() {
               sx={{ ":hover": { cursor: "pointer" } }}
               action={
                 <IconButton>
-                  {showSuggestions ? "^" : "v"}
+                  {showSuggestions ? <AiFillEyeInvisible /> : <AiFillEye />}
                 </IconButton>
               }
             />

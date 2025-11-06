@@ -9,7 +9,7 @@ type TabsContextType = {
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
 export const TabsProvider = ({ children }: { children: ReactNode }) => {
-  const [value, setValue] = useState("stats"); // aquí va el valor inicial 
+  const [value, setValue] = useState("modding"); // aquí va el valor inicial 
 
   return (
     <TabsContext.Provider value={{ value, setValue }}>

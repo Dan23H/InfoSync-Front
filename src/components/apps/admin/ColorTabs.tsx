@@ -16,8 +16,8 @@
           onChange={handleChange}
           centered
         >
-          <Tab value="stats" label="Estadísticas" />
-          <Tab value="activity" label="Registro de actividad" />
+          {/*<Tab value="stats" label="Estadísticas" />
+          <Tab value="activity" label="Registro de actividad" />*/}
           <Tab value="modding" label="Panel de moderación" />
           <Tab value="plans" label="Planes de estudio" />
         </Tabs>

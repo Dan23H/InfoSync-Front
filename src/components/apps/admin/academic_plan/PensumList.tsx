@@ -25,7 +25,7 @@ export default function PensumList({ onEdit }: PensumListProps) {
 
   return (
     <Box>
-      {data.map((p) => (
+      {data.slice().reverse().map((p) => (
         <PensumCard
           key={p._id}
           pensum={p}

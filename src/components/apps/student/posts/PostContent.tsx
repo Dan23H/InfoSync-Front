@@ -3,11 +3,16 @@ import CommentsSection from "../comments/CommentsSection";
 import type { Post } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useAuth } from "../../../../context";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { createReport, deletePost } from "../../../../api";
 import { useNavigate } from "react-router-dom";
 import ModalPost from "./ModalPost";
 import { updateDislike, updateLike, updatePost } from "../../../../api/post";
+import LikeSelected from "../../../../assets/LikeSelected.svg";
+import DislikeSelected from "../../../../assets/DislikeSelected.svg"; // Importar correctamente los íconos como componentes o rutas
+import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
+import { io, Socket } from "socket.io-client";
+import SocketContext from "../../../../context/SocketContext";
 
 interface PostContentProps {
   post: Post;
@@ -23,9 +28,10 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [isVoting, setIsVoting] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState<number>(post.likeCount ?? 0);
   const [localDislikeCount, setLocalDislikeCount] = useState<number>(post.dislikeCount ?? 0);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const { SocketDispatch } = useContext(SocketContext);
   const open = Boolean(anchorEl);
   const urlActual = window.location.pathname;
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
@@ -37,6 +43,73 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
     setLocalDislikeCount(post.dislikeCount ?? 0);
   }, [post.likeCount, post.dislikeCount]);
 
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+      console.error("Token is missing. Please log in to establish a WebSocket connection.");
+      return;
+    }
+
+    const newSocket = io("http://localhost:3000", {
+      query: { token },
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    setSocket(newSocket);
+
+    // Join the post room
+    newSocket.emit("joinPostRoom", post._id);
+
+    newSocket.on("connect", () => {
+      console.log("WebSocket connected.");
+
+      // Re-register listeners after reconnection
+      newSocket.on("like_update", ({ postId, likeCount }) => {
+        console.log("Received like_update event for postId:", postId, "with likeCount:", likeCount);
+        if (postId === post._id) {
+          setLocalLikeCount(likeCount);
+          console.log("Updated local like count to:", likeCount);
+        }
+      });
+
+      newSocket.on("dislike_update", ({ postId, dislikeCount }) => {
+        console.log("Received dislike_update event for postId:", postId, "with dislikeCount:", dislikeCount);
+        if (postId === post._id) {
+          setLocalDislikeCount(dislikeCount);
+          console.log("Updated local dislike count to:", dislikeCount);
+        }
+      });
+    });
+
+    newSocket.on("disconnect", () => {
+      console.warn("WebSocket disconnected.");
+    });
+
+    return () => {
+      // Leave the post room and clean up listeners
+      newSocket.off("like_update");
+      newSocket.off("dislike_update");
+      newSocket.emit("leavePostRoom", post._id);
+      newSocket.close();
+    };
+  }, [post._id]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    console.log("Dispatching register_post_listeners action for postId:", post._id);
+    SocketDispatch({
+      type: 'register_post_listeners',
+      payload: {
+        postId: post._id,
+        onLikeUpdate: setLocalLikeCount,
+        onDislikeUpdate: setLocalDislikeCount,
+      },
+    });
+  }, [socket, post._id]);
+
   const REPORT_REASONS = [
     "Inappropriate",
     "Harassment",
@@ -47,6 +120,12 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
     "Impersonation",
     "Privacy",
   ];
+
+  const score = useWilsonScore(localLikeCount, localDislikeCount);
+  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
+  const recommendation = getRecommendationLabel(score, totalVotes);
+  const recommendationLabel = recommendation.label;
+  const recommendationColor = recommendation.color;
 
   const canEditOrDelete =
     post.userId === user._id &&
@@ -68,42 +147,42 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
     await deletePost(post._id, user._id);
     setDeleteDialogOpen(false);
     navigate(urlVolver)
-    // Puedes redirigir o actualizar la vista aquí si lo necesitas
   };
 
   const handleLike = async () => {
-    if (isVoting) return;
-    setIsVoting(true);
-    const previousLike = localLikeCount;
-    // optimistic
-    setLocalLikeCount((c) => c + 1);
+    if (!socket) return;
+
+    const newLikeCount = localLikeCount + 1;
+    setLocalLikeCount(newLikeCount);
+
     try {
-      const updated = await updateLike(post._id);
-      setLocalLikeCount(updated.likeCount ?? updated.likeCount ?? 0);
-      setLocalDislikeCount(updated.dislikeCount ?? updated.dislikeCount ?? 0);
-    } catch (err) {
-      // revert
-      setLocalLikeCount(previousLike);
-      console.error("Error liking post:", err);
-    } finally {
-      setIsVoting(false);
+      // Emit like event to the server
+      await updateLike(post._id);
+      console.log("Attempting to emit like_update event for post:", post._id);
+      socket.emit("like_update", { postId: post._id, likeCount: newLikeCount }, () => {
+        console.log(`Server acknowledged like event for post: ${post._id} with likeCount: ${newLikeCount}`);
+      });
+    } catch (error) {
+      console.error("Error updating like count:", error);
+      setLocalLikeCount((prev) => prev - 1); // Revert on error
     }
   };
 
   const handleDislike = async () => {
-    if (isVoting) return;
-    setIsVoting(true);
-    const previousDislike = localDislikeCount;
-    setLocalDislikeCount((c) => c + 1);
+    if (!socket) return;
+    const newDislikeCount = localDislikeCount + 1;
+    setLocalDislikeCount(newDislikeCount);
+
     try {
-      const updated = await updateDislike(post._id);
-      setLocalLikeCount(updated.likeCount ?? updated.likeCount ?? 0);
-      setLocalDislikeCount(updated.dislikeCount ?? updated.dislikeCount ?? 0);
-    } catch (err) {
-      setLocalDislikeCount(previousDislike);
-      console.error("Error disliking post:", err);
-    } finally {
-      setIsVoting(false);
+      // Emit dislike event to the server
+      await updateDislike(post._id);
+      console.log("Attempting to emit dislike_update event for post:", post._id);
+      console.log("Socket connected state:", socket?.connected);
+      socket.emit("dislike_update", { postId: post._id, dislikeCount: newDislikeCount }, () => {
+        console.log(`Server acknowledged dislike event for post: ${post._id} with dislikeCount: ${newDislikeCount}`);
+      });
+    } catch (error) {
+      console.error("Error updating dislike count:", error);
     }
   };
 
@@ -281,11 +360,48 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
           </>
         )}
 
+        {/* Botones de Like/Dislike, Clasificación y URL */}
         <Divider sx={{ my: 2 }} />
-        <Button disabled={isVoting} onClick={(e) => { e.preventDefault(); handleLike(); }}>Like ({localLikeCount})</Button>
-        <Button disabled={isVoting} onClick={(e) => { e.preventDefault(); handleDislike(); }}>Dislike ({localDislikeCount})</Button>
-      </CardContent>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              sx={{
+                color: "red",
+                borderColor: "red",
+                backgroundColor: "transparent",
+                ":hover": {
+                  backgroundColor: "rgba(255, 0, 0, 0.1)",
+                  borderColor: "darkred",
+                },
+              }}
+              onClick={() => navigator.clipboard.writeText(window.location.href)}
+            >
+              Copiar URL
+            </Button>
+            {post.type === "S" && (
+              <Typography variant="caption" sx={{ color: recommendationColor, userSelect: "none" }}>
+                {recommendationLabel}
+              </Typography>
+            )}
+          </Box>
+          {post.type === "S" && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <IconButton onClick={(e) => { e.preventDefault(); handleLike(); }}>
+                <Box component="img" src={LikeSelected} alt="Like" sx={{ width: 24, height: 24 }} />
+              </IconButton>
+              <Typography variant="body2">{localLikeCount}</Typography>
+              <IconButton onClick={(e) => { e.preventDefault(); handleDislike(); }}>
+                <Box component="img" src={DislikeSelected} alt="Dislike" sx={{ width: 24, height: 24 }} />
+              </IconButton>
+              <Typography variant="body2">{localDislikeCount}</Typography>
+            </Box>
+          )}
+        </Box>
 
+      </CardContent>
+      <Divider sx={{ my: 2 }} />
       {/* Comentarios */}
       <CommentsSection
         postId={post._id}
@@ -348,7 +464,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
         onSubmit={async (data) => {
           await updatePost(post._id, data);
           setEditModalOpen(false);
-          window.location.reload(); 
+          window.location.reload();
         }}
         initialData={post}
         courses={[{ name: post.course, slug: "" }]}

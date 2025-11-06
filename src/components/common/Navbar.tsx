@@ -99,30 +99,33 @@ export default function Navbar() {
             </>
           )}
           {/* Search box - temporal */}
-          <TextField
-            size="small"
-            placeholder="Buscar posts..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`);
-              }
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    color="inherit"
-                    onClick={() => navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`)}
-                  >
-                    Buscar
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-            sx={{ ml: 2, width: 260 }}
-          />
+          {location.pathname === "/student" && (
+
+            <TextField
+              size="small"
+              placeholder="Buscar posts..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`);
+                }
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      color="inherit"
+                      onClick={() => navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`)}
+                    >
+                      Buscar
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ ml: 2, width: 260 }}
+            />
+          )}
         </Box>
 
         {/* Avatar y menú */}

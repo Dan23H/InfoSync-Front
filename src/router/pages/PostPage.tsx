@@ -1,9 +1,13 @@
 import { useParams } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import { usePosts } from "../../hooks/usePosts";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { ImageModal, PostContent, PostSidebar } from "../../components/apps/student/posts";
 import ErrorAlert from "../../components/common/ErrorAlert";
+import { useSocket } from "../../hooks/useSocket";
+import SocketContext from "../../context/SocketContext";
+
+const WSS_API_URL = "ws://localhost:3000";
 
 export default function PostPage() {
   const { plan, course, post: postId } = useParams<{ plan: string; course: string; post: string }>();
@@ -12,6 +16,29 @@ export default function PostPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [openImages, setOpenImages] = useState(false);
+
+  const { SocketDispatch } = useContext(SocketContext);
+  const token = localStorage.getItem("jwt");
+  const user = localStorage.getItem("user");
+  const socket = useSocket(WSS_API_URL, {
+    autoConnect: false,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 5000,
+  });
+
+  useEffect(() => {
+    if (token && user) {
+      socket.io.opts.query = { token, user };
+      socket.connect();
+      SocketDispatch({ type: "update_socket", payload: socket });
+    } else {
+      console.error("Missing token or user in localStorage. Socket will not connect.");
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket, SocketDispatch, token, user]);
 
   if (loading) return <Typography>Cargando post...</Typography>;
   if (error) return (
