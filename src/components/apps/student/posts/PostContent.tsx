@@ -11,7 +11,6 @@ import { updateDislike, updateLike, updatePost } from "../../../../api/post";
 import LikeSelected from "../../../../assets/LikeSelected.svg";
 import DislikeSelected from "../../../../assets/DislikeSelected.svg"; // Importar correctamente los íconos como componentes o rutas
 import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
-import { io, Socket } from "socket.io-client";
 import SocketContext from "../../../../context/SocketContext";
 
 interface PostContentProps {
@@ -30,14 +29,13 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState<number>(post.likeCount ?? 0);
   const [localDislikeCount, setLocalDislikeCount] = useState<number>(post.dislikeCount ?? 0);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const { SocketDispatch } = useContext(SocketContext);
+  const { SocketDispatch, SocketState } = useContext(SocketContext);
   const open = Boolean(anchorEl);
   const urlActual = window.location.pathname;
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
   const navigate = useNavigate();
 
-  const WSS_API_URL = import.meta.env.WSS_API_URL;
+  // WSS URL comes from global socket in context; no local socket creation here.
 
   // Sync local counters when post updates from props (e.g., via sockets)
   useEffect(() => {
@@ -45,72 +43,44 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
     setLocalDislikeCount(post.dislikeCount ?? 0);
   }, [post.likeCount, post.dislikeCount]);
 
+  // Use the global socket from SocketContext. Join the post room when the global socket is available.
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const socket = SocketState.socket;
+    if (!socket) return;
 
-    if (!token) {
-      console.error("Token is missing. Please log in to establish a WebSocket connection.");
-      return;
-    }
-
-    const newSocket = io(WSS_API_URL, {
-      query: { token },
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
-
-    setSocket(newSocket);
-
-    // Join the post room
-    newSocket.emit("joinPostRoom", post._id);
-
-    newSocket.on("connect", () => {
-      console.log("WebSocket connected.");
-
-      // Re-register listeners after reconnection
-      newSocket.on("like_update", ({ postId, likeCount }) => {
-        console.log("Received like_update event for postId:", postId, "with likeCount:", likeCount);
-        if (postId === post._id) {
-          setLocalLikeCount(likeCount);
-          console.log("Updated local like count to:", likeCount);
-        }
-      });
-
-      newSocket.on("dislike_update", ({ postId, dislikeCount }) => {
-        console.log("Received dislike_update event for postId:", postId, "with dislikeCount:", dislikeCount);
-        if (postId === post._id) {
-          setLocalDislikeCount(dislikeCount);
-          console.log("Updated local dislike count to:", dislikeCount);
-        }
-      });
-    });
-
-    newSocket.on("disconnect", () => {
-      console.warn("WebSocket disconnected.");
-    });
+    console.log(`Joining post room via global socket: post_${post._id}`);
+    SocketDispatch({ type: 'join_post_room', payload: { postId: post._id } });
 
     return () => {
-      // Leave the post room and clean up listeners
-      newSocket.off("like_update");
-      newSocket.off("dislike_update");
-      newSocket.emit("leavePostRoom", post._id);
-      newSocket.close();
+      // Optionally leave the post room when component unmounts
+      try {
+        socket.emit('leavePostRoom', post._id);
+      } catch (err) {
+        console.warn('Error leaving post room:', err);
+      }
     };
-  }, [post._id]);
+  }, [post._id, SocketState.socket]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!SocketState.socket) return;
 
     console.log("Dispatching register_post_listeners action for postId:", post._id);
     SocketDispatch({
       type: 'register_post_listeners',
-      payload: {
+      // cast to any because context payload union type is broad; keep callbacks here
+      payload: ({
         postId: post._id,
         onLikeUpdate: setLocalLikeCount,
         onDislikeUpdate: setLocalDislikeCount,
-      },
+        onCommentAdded: (comment: any) => {
+          console.log('Socket received comment_added for post', post._id, comment);
+        },
+        onCommentUpdated: (comment: any) => {
+          console.log('Socket received comment_updated for post', post._id, comment);
+        },
+      } as any),
     });
-  }, [socket, post._id]);
+  }, [SocketState.socket, post._id]);
 
   const REPORT_REASONS = [
     "Inappropriate",
@@ -152,18 +122,21 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   };
 
   const handleLike = async () => {
-    if (!socket) return;
+    // Ensure global socket exists
+    const socket = SocketState.socket;
+    if (!socket) {
+      console.warn('No global socket available for like');
+      return;
+    }
 
     const newLikeCount = localLikeCount + 1;
     setLocalLikeCount(newLikeCount);
 
     try {
-      // Emit like event to the server
+      // Update backend (persistent) then notify via socket through the reducer
       await updateLike(post._id);
-      console.log("Attempting to emit like_update event for post:", post._id);
-      socket.emit("like_update", { postId: post._id, likeCount: newLikeCount }, () => {
-        console.log(`Server acknowledged like event for post: ${post._id} with likeCount: ${newLikeCount}`);
-      });
+      console.log("Dispatching like_update via SocketDispatch for post:", post._id, newLikeCount);
+      SocketDispatch({ type: 'like_update', payload: { postId: post._id, likeCount: newLikeCount } });
     } catch (error) {
       console.error("Error updating like count:", error);
       setLocalLikeCount((prev) => prev - 1); // Revert on error
@@ -171,20 +144,22 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   };
 
   const handleDislike = async () => {
-    if (!socket) return;
+    const socket = SocketState.socket;
+    if (!socket) {
+      console.warn('No global socket available for dislike');
+      return;
+    }
+
     const newDislikeCount = localDislikeCount + 1;
     setLocalDislikeCount(newDislikeCount);
 
     try {
-      // Emit dislike event to the server
       await updateDislike(post._id);
-      console.log("Attempting to emit dislike_update event for post:", post._id);
-      console.log("Socket connected state:", socket?.connected);
-      socket.emit("dislike_update", { postId: post._id, dislikeCount: newDislikeCount }, () => {
-        console.log(`Server acknowledged dislike event for post: ${post._id} with dislikeCount: ${newDislikeCount}`);
-      });
+      console.log("Dispatching dislike_update via SocketDispatch for post:", post._id, newDislikeCount);
+      SocketDispatch({ type: 'dislike_update', payload: { postId: post._id, dislikeCount: newDislikeCount } });
     } catch (error) {
       console.error("Error updating dislike count:", error);
+      setLocalDislikeCount((prev) => prev - 1);
     }
   };
 
