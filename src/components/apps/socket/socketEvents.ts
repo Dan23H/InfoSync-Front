@@ -25,18 +25,20 @@ export const startSocketListeners = (
   });
 
   socket.on("like_update", ({ postId, likeCount }) => {
-    console.log(`Like count updated for post ${postId}: ${likeCount}`);
-    SocketDispatch({ type: "like_update", payload: { postId, likeCount } });
+    // Received like_update from server — do NOT re-dispatch 'like_update' to avoid re-emitting.
+    // The per-post listeners registered via 'register_post_listeners' (in SocketContext)
+    // should handle updating component state. Keep a log for debugging.
+    console.log(`[socketEvents] Received like_update for post ${postId}: ${likeCount}`);
   });
 
   socket.on("dislike_update", ({ postId, dislikeCount }) => {
-    console.log(`Dislike count updated for post ${postId}: ${dislikeCount}`);
-    SocketDispatch({ type: "dislike_update", payload: { postId, dislikeCount } });
+    // Received dislike_update from server — do NOT re-dispatch to avoid re-emitting.
+    console.log(`[socketEvents] Received dislike_update for post ${postId}: ${dislikeCount}`);
   });
 
   socket.on("comment_update", ({ postId, commentCount }) => {
-    console.log(`Comment count updated for post ${postId}: ${commentCount}`);
-    SocketDispatch({ type: "comment_update", payload: { postId, commentCount } });
+    // Received comment_update from server — do NOT re-dispatch to avoid re-emitting.
+    console.log(`[socketEvents] Received comment_update for post ${postId}: ${commentCount}`);
   });
 
   socket.on("update_users", (users) => {

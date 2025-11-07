@@ -114,15 +114,25 @@ export const socketReducer = (state: ISocketContextState, action: ISocketContext
 
       state.socket?.on('like_update', ({ postId: eventPostId, likeCount }) => {
         if (eventPostId === postId) {
-          console.log(`Received like_update for postId: ${eventPostId} with likeCount: ${likeCount}`);
-          onLikeUpdate(likeCount);
+          console.log(`(register_post_listeners) Received like_update for postId: ${eventPostId} with likeCount: ${likeCount}`);
+          try {
+            onLikeUpdate(likeCount);
+            console.log(`(register_post_listeners) onLikeUpdate callback executed for post ${eventPostId}`);
+          } catch (err) {
+            console.error('Error in onLikeUpdate callback:', err);
+          }
         }
       });
 
       state.socket?.on('dislike_update', ({ postId: eventPostId, dislikeCount }) => {
         if (eventPostId === postId) {
-          console.log(`Received dislike_update for postId: ${eventPostId} with dislikeCount: ${dislikeCount}`);
-          onDislikeUpdate(dislikeCount);
+          console.log(`(register_post_listeners) Received dislike_update for postId: ${eventPostId} with dislikeCount: ${dislikeCount}`);
+          try {
+            onDislikeUpdate(dislikeCount);
+            console.log(`(register_post_listeners) onDislikeUpdate callback executed for post ${eventPostId}`);
+          } catch (err) {
+            console.error('Error in onDislikeUpdate callback:', err);
+          }
         }
       });
 
