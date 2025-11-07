@@ -37,7 +37,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
   const navigate = useNavigate();
 
-  const WSS_API_URL = import.meta.env.WSS_API_URL || "ws://localhost:3000";
+  const WSS_API_URL = import.meta.env.WSS_API_URL;
 
   // Sync local counters when post updates from props (e.g., via sockets)
   useEffect(() => {

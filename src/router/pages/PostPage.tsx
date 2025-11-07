@@ -7,7 +7,7 @@ import ErrorAlert from "../../components/common/ErrorAlert";
 import { useSocket } from "../../hooks/useSocket";
 import SocketContext from "../../context/SocketContext";
 
-const WSS_API_URL = import.meta.env.WSS_API_URL || "ws://localhost:3000";
+const WSS_API_URL = import.meta.env.WSS_API_URL;
 
 export default function PostPage() {
   const { plan, course, post: postId } = useParams<{ plan: string; course: string; post: string }>();
