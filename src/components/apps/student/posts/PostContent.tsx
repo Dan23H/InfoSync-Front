@@ -37,6 +37,8 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
   const navigate = useNavigate();
 
+  const WSS_API_URL = import.meta.env.WSS_API_URL || "ws://localhost:3000";
+
   // Sync local counters when post updates from props (e.g., via sockets)
   useEffect(() => {
     setLocalLikeCount(post.likeCount ?? 0);
@@ -51,7 +53,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
       return;
     }
 
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io(WSS_API_URL, {
       query: { token },
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,

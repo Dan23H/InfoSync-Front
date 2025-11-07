@@ -10,7 +10,7 @@ import { useSocket } from "../../hooks/useSocket";
 import SocketContext from "../../context/SocketContext";
 import { AiFillEye, AiFillEyeInvisible, AiFillHome } from "react-icons/ai";
 
-const WSS_API_URL = "ws://localhost:3000";
+const WSS_API_URL = import.meta.env.WSS_API_URL || "ws://localhost:3000";
 
 export default function PostsListPage() {
   const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
