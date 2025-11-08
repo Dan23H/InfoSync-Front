@@ -11,17 +11,35 @@ export const createUser = (data: { userName: string; userEmail: string; password
 export const getUsers = () =>
     request<any[]>(`${BASE_URL}/user`, { method: "GET" });
 
+export const updateUser = (id: string, data: { userName?: string; userEmail?: string; role?: string; status?: string }) => {
+    const payload: Record<string, any> = {};
+    Object.entries(data).forEach(([k, v]) => { if (v !== undefined && v !== null) payload[k] = v; });
+    return request<any>(`${BASE_URL}/user/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+    });
+};
+
 export const getUserById = (id: string) =>
     request<any>(`${BASE_URL}/user/${id}`, { method: "GET" });
 
-export const updateUser = (id: string, data: { userName?: string; userEmail?: string; role?: string }) => {
-    console.log("Updating user:", id, data);
-    const url = `${BASE_URL}/user/${id}`;
-    return request<any>(url, {
+export const updateUserName = (id: string, userName?: string) => {
+  // sólo enviar si viene un string no vacío (trim)
+  const name = typeof userName === 'string' ? userName.trim() : '';
+  if (!name) {
+    console.warn('No se envió userName válido, omitiendo petición.');
+    return;
+  }
+
+  const payload = { userName: name };
+  console.log('Updating user:', id, payload);
+
+    return request<any>(`${BASE_URL}/user/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
     });
 };
+
 
 export const updateUserStatus = (id: string, status: string) =>
     request<any>(`${BASE_URL}/user/${id}/status`, {

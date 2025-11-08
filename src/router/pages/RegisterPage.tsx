@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Paper, FormControl, InputLabel, Input, Button, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Paper, FormControl, InputLabel, Input, Button, Typography } from "@mui/material";
 import { createUser } from "../../api";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../../components/common/ErrorAlert";
@@ -20,7 +20,6 @@ export default function RegisterPage() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [role, setRole] = useState<"student" | "admin">("student");
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +36,7 @@ export default function RegisterPage() {
         }
         setLoading(true);
         try {
-            await createUser({ userEmail: email, userName: userName, password, role });
+            await createUser({ userEmail: email, userName: userName, password, role: "student" });
             navigate("/login");
         } catch (err: any) {
             setError("Error al registrar usuario. Intenta con otro correo o nombre.");
@@ -168,19 +167,6 @@ export default function RegisterPage() {
                                         </InputAdornment>
                                     }
                                 />
-                            </FormControl>
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel id="role-label">Rol</InputLabel>
-                                <Select
-                                    labelId="role-label"
-                                    id="role"
-                                    value={role}
-                                    label="Rol"
-                                    onChange={e => setRole(e.target.value as "student" | "admin")}
-                                >
-                                    <MenuItem value="student">Estudiante</MenuItem>
-                                    <MenuItem value="admin">Administrador</MenuItem>
-                                </Select>
                             </FormControl>
                             {error && (
                                 <ErrorAlert

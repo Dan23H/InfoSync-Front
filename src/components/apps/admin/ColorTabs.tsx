@@ -20,6 +20,7 @@
           <Tab value="activity" label="Registro de actividad" />*/}
           <Tab value="modding" label="Panel de moderación" />
           <Tab value="plans" label="Planes de estudio" />
+          <Tab value="users" label="Usuarios" />
         </Tabs>
       </Box>
     );

@@ -5,6 +5,7 @@ import ColorTabs from '../../components/apps/admin/ColorTabs';
 //import RegActivity from '../../components/apps/admin/auditor/RegActivity';
 //import Stats from '../../components/apps/admin/stats/Stats';
 import Modding from '../../components/apps/admin/moderation/Modding';
+import Users from '../../components/apps/admin/Users';
 import Navbar from '../../components/common/Navbar';
 
 export default function AdminMainPage() {
@@ -18,6 +19,7 @@ export default function AdminMainPage() {
         {value == "plans" && <PlansViewer/>}
         {/*value === "activity" && <RegActivity />*/}
         {value === "modding" && <Modding/>}
+        {value === "users" && <Users/>}
       </Box>
     </Box>
   );

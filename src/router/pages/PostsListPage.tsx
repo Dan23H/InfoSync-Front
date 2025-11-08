@@ -6,11 +6,11 @@ import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid, 
 import PostCard from "../../components/apps/student/posts/PostCard";
 import { usePlan } from "../../context/PlanContext";
 import { useAuth } from "../../context/AuthContext";
-import { useSocket } from "../../hooks/useSocket";
 import SocketContext from "../../context/SocketContext";
 import { AiFillEye, AiFillEyeInvisible, AiFillHome } from "react-icons/ai";
 
-const WSS_API_URL = import.meta.env.WSS_API_URL;
+// WSS url is handled centrally by the Socket provider
+// const WSS_API_URL = import.meta.env.WSS_API_URL;
 
 export default function PostsListPage() {
   const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
@@ -38,29 +38,8 @@ export default function PostsListPage() {
   const [showSuggestions, setShowSuggestions] = useState(true);
 
   const navigate = useNavigate();
-  const { SocketDispatch } = useContext(SocketContext);
-  const socket = useSocket(WSS_API_URL, {
-    autoConnect: false,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 5000,
-  });
-
-  useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    const user = localStorage.getItem("user");
-
-    if (token && user) {
-      socket.io.opts.query = { token, user };
-      socket.connect();
-      SocketDispatch({ type: "update_socket", payload: socket });
-    } else {
-      console.error("Missing token or user in localStorage. Socket will not connect.");
-    }
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket, SocketDispatch]);
+  // Socket is now created and provided by the SocketContext provider at app root.
+  useContext(SocketContext);
 
   useEffect(() => {
     if (!plan) return;

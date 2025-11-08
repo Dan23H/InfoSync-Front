@@ -3,10 +3,10 @@ import { Box, Card, CardContent, Typography, Button, Grid, IconButton, Divider, 
 import { useAuth } from "../../context/AuthContext"; // ajusta la ruta según tu proyecto
 import { EditSVG } from "../../assets";
 import { useMatch, useNavigate } from "react-router-dom";
-import { updateUser } from "../../api";
+import { updateUserName } from "../../api";
 
 export default function ProfilePage() {
-    const { user } = useAuth();
+    const { user, updateLocalUser } = useAuth();
     // user = { userId, userEmail, userName, password, role, status }
 
     const [showEmail, setShowEmail] = useState(false);
@@ -23,7 +23,19 @@ export default function ProfilePage() {
 
     const handleEditProfile = async () => {
         try {
-            await updateUser(user._id, { userName: editName });
+            const updated = await updateUserName(user._id, editName);
+
+            // If backend returns the updated user, use it; otherwise merge locally
+            const updatedUser = updated && typeof updated === 'object' ? updated : { ...(user || {}), userName: editName };
+
+            // Update auth context + localStorage so UI updates immediately
+            try {
+                updateLocalUser(updatedUser);
+            } catch (e) {
+                console.warn('Failed to update user via AuthContext, falling back to localStorage', e);
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+
             alert("Perfil actualizado con éxito.");
             navigate("/student/profile");
         } catch (err) {
