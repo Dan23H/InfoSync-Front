@@ -26,8 +26,12 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
     (async () => {
       try {
         const data = await getComments(postId);
-        setComments(data);
-        const total = data.reduce(
+        // ordenar por createdAt descendente (más nuevo primero)
+        const sorted = Array.isArray(data)
+          ? data.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          : data;
+        setComments(sorted as Comment[]);
+        const total = (sorted as Comment[]).reduce(
           (acc, c) => acc + 1 + (c.subComments?.length || 0),
           0
         );
@@ -43,32 +47,44 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
   useEffect(() => {
     if (!SocketState.socket) return;
 
-    const handleCommentAdded = (comment: Comment) => {
-      console.log("New comment added:", comment);
+    // Attach direct socket listeners for comment events. We filter by postId inside the handlers
+    const socket = SocketState.socket;
+
+    const handleSocketCommentAdded = ({ postId: eventPostId, comment }: { postId: string; comment: Comment }) => {
+      if (eventPostId !== postId) return;
+      console.log("Socket: comment_added received for post", eventPostId, comment);
       setComments((prev) => {
-        const updated = [comment, ...prev];
-        updateCommentCount(updated);
-        return updated;
+        const merged = [comment, ...prev];
+        const unique = uniqCommentsById(merged);
+        updateCommentCount(unique);
+        return unique;
       });
     };
 
-    const handleCommentUpdated = (updatedComment: Comment) => {
-      console.log("Comment updated:", updatedComment);
+    const handleSocketCommentUpdated = ({ postId: eventPostId, comment: updatedComment }: { postId: string; comment: Comment }) => {
+      if (eventPostId !== postId) return;
+      console.log("Socket: comment_updated received for post", eventPostId, updatedComment);
       setComments((prev) => {
-        const updated = prev.map((c) => (c._id === updatedComment._id ? updatedComment : c));
-        updateCommentCount(updated);
-        return updated;
+        const exists = prev.some((c) => c._id === updatedComment._id);
+        let updated: Comment[];
+        if (exists) {
+          updated = prev.map((c) => (c._id === updatedComment._id ? updatedComment : c));
+        } else {
+          // If we didn't have the comment locally (rare), add it at the top
+          updated = [updatedComment, ...prev];
+        }
+        const unique = uniqCommentsById(updated);
+        updateCommentCount(unique);
+        return unique;
       });
     };
 
-    SocketState.socket.on("comment_added", handleCommentAdded);
-    SocketState.socket.on("comment_updated", handleCommentUpdated);
+    socket.on("comment_added", handleSocketCommentAdded);
+    socket.on("comment_updated", handleSocketCommentUpdated);
 
     return () => {
-      if (SocketState.socket) {
-        SocketState.socket.off("comment_added", handleCommentAdded);
-        SocketState.socket.off("comment_updated", handleCommentUpdated);
-      }
+      socket.off("comment_added", handleSocketCommentAdded);
+      socket.off("comment_updated", handleSocketCommentUpdated);
     };
   }, [SocketState.socket]);
 
@@ -81,15 +97,34 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
     onCommentCountChange?.(total);
   };
 
+  const uniqCommentsById = (list: Comment[]) => {
+    const seen = new Set<string>();
+    const out: Comment[] = [];
+    for (const c of list) {
+      if (!c || !c._id) continue;
+      if (seen.has(c._id)) continue;
+      seen.add(c._id);
+      out.push(c);
+    }
+    return out;
+  };
+
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     setLoading(true);
     try {
-      const comment = await createComment({ userId, postId, commentary: newComment });
+      const payload = {
+        userId: String(userId),
+        postId: String(postId).trim(),
+        commentary: newComment.trim(),
+      };
+
+      const comment = await createComment(payload);
       setComments((prev) => {
-        const updated = [comment, ...prev];
-        updateCommentCount(updated);
-        return updated;
+        const merged = [comment, ...prev];
+        const unique = uniqCommentsById(merged);
+        updateCommentCount(unique);
+        return unique;
       });
       setNewComment("");
     } catch (err) {
@@ -106,8 +141,9 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
 
       setComments((prev) => {
         const updated = prev.map((c) => (c._id === commentId ? updatedComment : c));
-        updateCommentCount(updated);
-        return updated;
+        const unique = uniqCommentsById(updated);
+        updateCommentCount(unique);
+        return unique;
       });
     } catch (err) {
       console.error("Error creando subcomentario:", err);
