@@ -6,9 +6,10 @@ import { createReport } from "../../../../api";
 
 interface SubcommentItemProps {
   subComment: SubComment;
+  parentCommentId?: string;
 }
 
-export default function SubCommentItem({ subComment }: SubcommentItemProps) {
+export default function SubCommentItem({ subComment, parentCommentId }: SubcommentItemProps) {
   const { user: subAuthor, loading } = useAuthor(subComment.userId || null);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -26,12 +27,14 @@ export default function SubCommentItem({ subComment }: SubcommentItemProps) {
   ];
 
   const handleReportSubmit = async () => {
-    await createReport({
+    const payload: any = {
       userId: subComment.userId, // O el usuario actual si lo tienes
       targetType: "subcomment",
       targetId: subComment._id,
       reason: reportReason,
-    });
+    };
+    if (parentCommentId) payload.commentId = parentCommentId;
+    await createReport(payload);
     setReportDialogOpen(false);
     setReportReason("");
     setSnackbarOpen(true);

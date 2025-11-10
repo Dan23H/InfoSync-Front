@@ -80,8 +80,8 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
             {showSubcomments && (
                 <Box sx={{ ml: 6, mt: 1 }}>
                     {comment.subComments?.map((sc) => (
-                        <SubCommentItem key={sc._id} subComment={sc} />
-                    ))}
+                            <SubCommentItem key={sc._id} subComment={sc} parentCommentId={comment._id} />
+                        ))}
                 </Box>
             )}
 

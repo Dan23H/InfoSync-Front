@@ -30,7 +30,8 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     const initialForm = {
         title: initialData?.title || "",
         subject: initialData?.subject || "",
-        course: initialData?.course || (courses[0]?.name ?? ""),
+    // Do not default to the first course: require explicit selection
+    course: initialData?.course || "",
         type: (initialData?.type as "Q" | "S") || "Q", // default válido
         description: initialData?.description || "",
         images: [] as File[],
@@ -57,29 +58,48 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
         }
     };
 
-    const validate = () => {
+    // When the course input loses focus, if the user typed something but didn't pick an
+    // option, auto-select the first suggestion that includes the typed text (case-insensitive).
+    const handleCourseBlur = () => {
+        const typed = (form.course || "").trim();
+        if (!typed) return;
+        const exact = courses.find(c => c.name === form.course);
+        if (!exact) {
+            const match = courses.find(c => c.name.toLowerCase().includes(typed.toLowerCase()));
+            if (match) {
+                setForm(prev => ({ ...prev, course: match.name }));
+                // clear course error if any
+                setErrors(prev => {
+                    const next = { ...prev };
+                    delete next.course;
+                    return next;
+                });
+            }
+        }
+    };
+
+    const validate = (overrideCourse?: string) => {
         const newErrors: { [key: string]: string } = {};
 
-        if (!form.title || form.title.trim().length < 5) {
-            newErrors.title = "El título debe tener al menos 5 caracteres.";
+        if (!form.title || form.title.trim().length < 6) {
+            newErrors.title = "El título debe tener al menos 6 caracteres.";
         }
 
         if (!form.subject) {
             newErrors.subject = "Las palabras clave son obligatorias.";
         } else if (form.subject.endsWith(" ")) {
-            newErrors.subject = "Las palabras clave no deben terminar en espacio.";
+            newErrors.subject = "La palabra clave no debe terminar en espacio.";
+        } else if (form.subject.trim().length < 5) {
+            newErrors.subject = "La palabra clave debe tener al menos 5 caracteres.";
         }
 
         if (!form.description || form.description.trim().length < 10) {
             newErrors.description = "La descripción debe tener al menos 10 caracteres.";
         }
 
-        if (!form.course) {
-            if (courses.length > 0) {
-                handleChange("course", courses[0].name); // fallback al primero
-            } else {
-                newErrors.course = "Debes seleccionar una asignatura.";
-            }
+        const courseValue = overrideCourse !== undefined ? overrideCourse : form.course;
+        if (!courseValue) {
+            newErrors.course = "Debes seleccionar una asignatura.";
         }
 
         if (!form.type) {
@@ -91,7 +111,27 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     };
 
     const handleSubmit = () => {
-        if (!validate()) return;
+        // If the user typed something but didn't pick a suggestion, try to auto-resolve
+        // to the first suggestion that matches what they typed (case-insensitive includes).
+        let resolvedCourse: string | undefined = undefined;
+        if (form.course) {
+            const exact = courses.find(c => c.name === form.course);
+            if (!exact) {
+                const typed = form.course.trim();
+                if (typed.length > 0) {
+                    const match = courses.find(c => c.name.toLowerCase().includes(typed.toLowerCase()));
+                    if (match) {
+                        resolvedCourse = match.name;
+                        // update the form so UI reflects selection
+                        setForm(prev => ({ ...prev, course: match.name }));
+                    }
+                }
+            }
+        }
+
+        if (!validate(resolvedCourse)) return;
+
+        const courseForPayload = (resolvedCourse ?? form.course).trim();
 
         const payload = {
             userId: user._id,
@@ -99,7 +139,7 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
             title: form.title.trim(),
             subject: form.subject.split(" ")[0].toLowerCase(),
             description: form.description.trim(),
-            course: form.course.trim(),
+            course: courseForPayload,
             type: form.type as "Q" | "S",
             images: form.images?.length ? form.images : [],
             files: form.files?.length ? form.files : []
@@ -149,19 +189,20 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                         error={!!errors.course}
                                         helperText={errors.course}
                                         color="primary"
+                                        onBlur={() => handleCourseBlur()}
                                     />
                                 )}
                             />
                         </Grid>
 
-                        {/* Palabras clave */}
+                        {/* Palabra clave */}
                         <Grid size={{ xs: 6 }}>
                             <TextField
                                 fullWidth
-                                label="Palabras clave"
+                                label="Palabra clave"
                                 value={form.subject}
                                 onChange={(e) => handleChange("subject", e.target.value)}
-                                helperText={errors.subject || "Ejemplo (una sola palabra): integrales"}
+                                helperText={errors.subject || "Ejemplo: integrales"}
                                 error={!!errors.subject}
                                 color="primary"
                             />

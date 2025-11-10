@@ -112,7 +112,7 @@ export default function ReportList({ reports, authors, filter, onView, onDelete 
 
                                             size="small"
                                             startIcon={<img src={DeleteSVG} alt="delete" style={{ width: 16, height: 16 }} />}
-                                            onClick={() => onDelete(r._id, r.userId)}
+                                            onClick={() => onDelete(r._id)}
                                             sx={{
                                                 textTransform: "none",
                                                 fontWeight: 500,

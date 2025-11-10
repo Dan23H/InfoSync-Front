@@ -17,7 +17,7 @@ export interface ReportListProps {
   authors: { [userId: string]: string };
   filter: string;
   onView: (report: Report) => void;
-  onDelete: (reportId: string, userId: string) => void;
+  onDelete: (reportId: string) => void;
 }
 
 export interface ModerationState {

@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { deleteReport, getReports, resolveReport } from "../../../../api/report";
+import { useAuth } from "../../../../context/AuthContext";
 import { getUserById, updateUserStatus } from "../../../../api/user";
 import ReportList from "./ReportList";
 import ReportModal from "./ReportModal";
@@ -58,8 +59,42 @@ export default function Modding() {
     } else if (report.targetType === "comment") {
       content = await getCommentById(report.targetId);
     } else if (report.targetType === "subcomment") {
-      let comment = await getCommentById(report.targetId);
-      content = comment?.subComments?.find((sc) => sc._id === report.targetId) || null;
+      // If the report includes the parent comment id (commentId) use it to fetch the comment
+      if (report.commentId) {
+        const parent = await getCommentById(report.commentId);
+        const found = parent?.subComments?.find((sc) => sc._id === report.targetId) || null;
+        if (found) {
+          // Enrich the subcomment with parent/post metadata so modal and moderation actions can use it
+          // parent.postId should exist on the parent comment
+          let pensumId: string | undefined = undefined;
+          let course: string | undefined = undefined;
+          try {
+            const post = await getPostById(parent.postId);
+            pensumId = post?.pensumId;
+            course = post?.course;
+          } catch (err) {
+            // ignore post fetch errors; enrichment is best-effort
+          }
+          content = {
+            ...found,
+            commentId: parent._id,
+            postId: parent.postId,
+            pensumId,
+            course
+          };
+        } else {
+          content = null;
+        }
+      } else {
+        // Fallback: try to fetch by targetId (may fail if API expects comment ids)
+        try {
+          const maybeParent = await getCommentById(report.targetId);
+          content = maybeParent?.subComments?.find((sc) => sc._id === report.targetId) || null;
+        } catch (err) {
+          // Could not locate parent comment — leave content null
+          content = null;
+        }
+      }
     }
     setModalContent(content);
     setModalReport(report);
@@ -129,10 +164,17 @@ export default function Modding() {
     }
   };
 
-  const handleDeleteReport = async (reportId: string, userId: string) => {
+  const { user } = useAuth();
+
+  const handleDeleteReport = async (reportId: string) => {
     if (!window.confirm("¿Seguro que quieres borrar este reporte?")) return;
     try {
-      await deleteReport(reportId, userId);
+      if (!user) {
+        alert("No autorizado. Inicia sesión de nuevo.");
+        return;
+      }
+      const currentUserId = user.userId || user._id;
+      await deleteReport(reportId, currentUserId);
       setReports(reports => reports.filter(r => r._id !== reportId));
       alert("Reporte borrado correctamente.");
     } catch (err) {
