@@ -60,6 +60,17 @@ export default function Navbar() {
     });
   };
 
+  const handleSearch = (query: string) => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    // Use the current plan (from context) when navigating to the search view so
+    // results are scoped to the same plan used by "Crear publicación".
+    const planToUse = planId;
+    if (planToUse) {
+      navigate(`/student/${planToUse}/?${params.toString()}`);
+    }
+  };
+
   return (
     <AppBar position="static" color="default" elevation={1}>
       <Toolbar>
@@ -98,8 +109,8 @@ export default function Navbar() {
               )}
             </>
           )}
-          {/* Search box - temporal */}
-          {location.pathname === "/student" && (
+          {/* Search box - show on any student route so users can search within the current plan */}
+          {location.pathname.startsWith("/student") && (
 
             <TextField
               size="small"
@@ -108,7 +119,7 @@ export default function Navbar() {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`);
+                  handleSearch(search);
                 }
               }}
               InputProps={{
@@ -116,7 +127,7 @@ export default function Navbar() {
                   <InputAdornment position="end">
                     <Button
                       color="inherit"
-                      onClick={() => navigate(`/student${search ? `?q=${encodeURIComponent(search)}` : ""}`)}
+                      onClick={() => handleSearch(search)}
                     >
                       Buscar
                     </Button>

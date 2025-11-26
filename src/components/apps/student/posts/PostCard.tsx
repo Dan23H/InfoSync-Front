@@ -305,7 +305,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         onClose={() => setEditModalOpen(false)}
         onSubmit={handleEditPost}
         initialData={post}
-        courses={[{ name: post.course, slug: "" }]} // O tu lista de cursos
+        courses={[{ name: post.course, slug: "" }]}
       />
 
       {/* Feedback */}

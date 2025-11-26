@@ -41,6 +41,8 @@ export default function AppRouter() {
                     <Route index element={<StudentMainPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="profile/edit" element={<ProfilePage />} />
+                    {/* Route for plan-level listing/search; queries are read from location.search inside the page */}
+                    <Route path=":plan" element={<PostsListPage />} />
                     <Route path=":plan/:course" element={<PostsListPage />} />
                     <Route path=":plan/:course/:post" element={<PostPage />} />
                 </Route>

@@ -3,14 +3,12 @@ import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
 import { useEffect, useState, useContext } from "react";
 import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid, Fab } from "@mui/material";
+import SearchResults from "../../components/apps/student/posts/SearchResults";
 import PostCard from "../../components/apps/student/posts/PostCard";
 import { usePlan } from "../../context/PlanContext";
 import { useAuth } from "../../context/AuthContext";
 import SocketContext from "../../context/SocketContext";
 import { AiFillEye, AiFillEyeInvisible, AiFillHome } from "react-icons/ai";
-
-// WSS url is handled centrally by the Socket provider
-// const WSS_API_URL = import.meta.env.WSS_API_URL;
 
 export default function PostsListPage() {
   const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
@@ -38,7 +36,6 @@ export default function PostsListPage() {
   const [showSuggestions, setShowSuggestions] = useState(true);
 
   const navigate = useNavigate();
-  // Socket is now created and provided by the SocketContext provider at app root.
   useContext(SocketContext);
 
   useEffect(() => {
@@ -50,12 +47,13 @@ export default function PostsListPage() {
       .finally(() => setPensumLoading(false));
   }, [plan]);
 
+
+  const sortedPosts = posts.slice().sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
   if (postsLoading || pensumLoading) return <Typography>Cargando...</Typography>;
   if (postsError) return <Typography color="error">{postsError}</Typography>;
   if (pensumError) return <Typography color="error">{pensumError}</Typography>;
   if (!pensum) return <Typography>No se encontró el plan académico.</Typography>;
-
-  const sortedPosts = posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const questions = sortedPosts?.filter((p) => p.type === "Q") ?? [];
   const suggestions = sortedPosts?.filter((p) => p.type === "S") ?? [];
@@ -75,55 +73,64 @@ export default function PostsListPage() {
           {<AiFillHome />}
         </Fab>
 
-        {/* Preguntas */}
-        <Grid size={{ xs: 12, md: gridSize }}>
-          <Card sx={{ mb: 2 }}>
-            <CardHeader
-              title="Preguntas"
-              onClick={() => setShowQuestions((prev) => !prev)}
-              sx={{ ":hover": { cursor: "pointer" } }}
-              action={
-                <IconButton>
-                  {showQuestions ? <AiFillEyeInvisible /> : <AiFillEye />}
-                </IconButton>
-              }
-            />
-            <Collapse in={showQuestions} timeout="auto" unmountOnExit>
-              <CardContent>
-                {questions.length === 0 ? (
-                  <Typography variant="body2">No hay preguntas todavía.</Typography>
-                ) : (
-                  questions.map((q) => <PostCard key={q._id} post={q} currentUserId={user._id} />)
-                )}
-              </CardContent>
-            </Collapse>
-          </Card>
-        </Grid>
+        {q ? (
+          <>
+            {/* Resultados de la Query */}
+            <SearchResults posts={posts} query={params.get("q")} currentUserId={user._id} />
+          </>
+        ) : (
+          <>
+            {/* Preguntas */}
+            <Grid size={{ xs: 12, md: gridSize }}>
+              <Card sx={{ mb: 2 }}>
+                <CardHeader
+                  title="Preguntas"
+                  onClick={() => setShowQuestions((prev) => !prev)}
+                  sx={{ ":hover": { cursor: "pointer" } }}
+                  action={
+                    <IconButton>
+                      {showQuestions ? <AiFillEyeInvisible /> : <AiFillEye />}
+                    </IconButton>
+                  }
+                />
+                <Collapse in={showQuestions} timeout="auto" unmountOnExit>
+                  <CardContent>
+                    {questions.length === 0 ? (
+                      <Typography variant="body2">No hay preguntas todavía.</Typography>
+                    ) : (
+                      questions.map((q) => <PostCard key={q._id} post={q} currentUserId={user._id} />)
+                    )}
+                  </CardContent>
+                </Collapse>
+              </Card>
+            </Grid>
 
-        {/* Sugerencias */}
-        <Grid size={{ xs: 12, md: gridSize }}>
-          <Card sx={{ mb: 2 }}>
-            <CardHeader
-              title="Sugerencias"
-              onClick={() => setShowSuggestions((prev) => !prev)}
-              sx={{ ":hover": { cursor: "pointer" } }}
-              action={
-                <IconButton>
-                  {showSuggestions ? <AiFillEyeInvisible /> : <AiFillEye />}
-                </IconButton>
-              }
-            />
-            <Collapse in={showSuggestions} timeout="auto" unmountOnExit>
-              <CardContent>
-                {suggestions.length === 0 ? (
-                  <Typography variant="body2">No hay sugerencias todavía.</Typography>
-                ) : (
-                  suggestions.map((s) => <PostCard key={s._id} post={s} currentUserId={user._id} />)
-                )}
-              </CardContent>
-            </Collapse>
-          </Card>
-        </Grid>
+            {/* Sugerencias */}
+            <Grid size={{ xs: 12, md: gridSize }}>
+              <Card sx={{ mb: 2 }}>
+                <CardHeader
+                  title="Sugerencias"
+                  onClick={() => setShowSuggestions((prev) => !prev)}
+                  sx={{ ":hover": { cursor: "pointer" } }}
+                  action={
+                    <IconButton>
+                      {showSuggestions ? <AiFillEyeInvisible /> : <AiFillEye />}
+                    </IconButton>
+                  }
+                />
+                <Collapse in={showSuggestions} timeout="auto" unmountOnExit>
+                  <CardContent>
+                    {suggestions.length === 0 ? (
+                      <Typography variant="body2">No hay sugerencias todavía.</Typography>
+                    ) : (
+                      suggestions.map((s) => <PostCard key={s._id} post={s} currentUserId={user._id} />)
+                    )}
+                  </CardContent>
+                </Collapse>
+              </Card>
+            </Grid>
+          </>
+        )}
       </Grid>
     </>
   );
