@@ -8,13 +8,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const { children } = props;
     const [SocketState, SocketDispatch] = useReducer(socketReducer, defaultSocketContextState);
 
-    const WSS_API_URL = import.meta.env.VITE_WSS_API_URL || import.meta.env.WSS_API_URL || (() => {
-        if (typeof window !== 'undefined') {
-            const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-            return `${proto}://${window.location.host}`;
-        }
-        return 'ws://localhost:3000';
-    })();
+    const WSS_API_URL = import.meta.env.VITE_WSS_API_URL || import.meta.env.WSS_API_URL || 'ws://localhost:3000';
 
     console.log('Socket WSS_API_URL resolved to:', WSS_API_URL);
 
