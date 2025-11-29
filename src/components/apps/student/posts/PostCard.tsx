@@ -1,5 +1,5 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, Select, Divider } from "@mui/material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Post } from "../../../../models";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
@@ -20,7 +20,9 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [squareMounted, setSquareMounted] = useState(false);
+  const [squareVisible, setSquareVisible] = useState(false);
+  const hideTimerRef = useRef<number | null>(null);
 
   const { user: author, loading } = useAuthor(post.userId);
 
@@ -177,51 +179,80 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             <Typography variant="body2" sx={{ userSelect: "none" }}>
               {commentsCount} – Comentarios
             </Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-              {copied && (
-                <Typography
-                  variant="caption"
+            <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+              {squareMounted && (
+                <Box
                   sx={{
                     position: "absolute",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    px: 1,
-                    py: 0.2,
+                    top: "50%",
+                    left: "100%",
+                    transform: squareVisible ? "translate(0, -50%)" : "translate(5px, -50%)",
+                    width: 20,
+                    height: 20,
+                    border: "2px solid green",
                     borderRadius: 1,
-                    color: "green",
-                    fontWeight: 500,
-                    fontSize: "0.7em",
-                    userSelect: "none",
-                    animation: "flyUp 0.5s cubic-bezier(.42,0,.58,1) forwards",
-                    "@keyframes flyUp": {
-                      from: { opacity: 0, top: 0 },
-                      to: { opacity: 1, top: -18 },
-                    }
+                    backgroundColor: "transparent",
+                    transition: "transform 300ms cubic-bezier(.42,0,.58,1), opacity 300ms",
+                    opacity: squareVisible ? 1 : 0,
+                    pointerEvents: "none",
+                    boxSizing: "border-box",
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'green',
+                    fontSize: '1rem',
+                    lineHeight: 1,
                   }}
                 >
-                  ¡Copiado!
-                </Typography>
+                  <span aria-hidden="true">✔</span>
+                </Box>
               )}
-              <Typography
-                variant="body2"
-                sx={{ cursor: "pointer", ":hover": { color: "darkblue" }, userSelect: "none" }}
+
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  color: "red",
+                  borderColor: "red",
+                  backgroundColor: "transparent",
+                  ":hover": {
+                    backgroundColor: "rgba(255, 0, 0, 0.1)",
+                    borderColor: "darkred",
+                  },
+                }}
                 onClick={() => {
-                  const url = `${window.location.origin}/student/${post.pensumId}/${slugify(post.course)}/${post._id}`;
-                  navigator.clipboard.writeText(url);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 4000);
+                  navigator.clipboard.writeText(window.location.href);
+
+                  // reset previous timer
+                  if (hideTimerRef.current) {
+                    window.clearTimeout(hideTimerRef.current);
+                    hideTimerRef.current = null;
+                  }
+                  if (!squareMounted) {
+                    setSquareMounted(true);
+                    requestAnimationFrame(() => setSquareVisible(true));
+                  } else {
+                    setSquareVisible(true);
+                  }
+
+                  hideTimerRef.current = window.setTimeout(() => {
+                    setSquareVisible(false);
+                    window.setTimeout(() => setSquareMounted(false), 300);
+                    hideTimerRef.current = null;
+                  }, 5000);
                 }}
               >
                 Copiar URL
-              </Typography>
+              </Button>
             </Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {post.type === "S" && (
               <Typography variant="body2" sx={{ userSelect: "none", color: recommendationColor }}>
                 {recommendationLabel}
               </Typography>
             )}
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {/* Botones Like/Dislike para sugerencias */}
             {post.type === "S" && (
               <Box sx={{ display: "flex", gap: 1 }}>

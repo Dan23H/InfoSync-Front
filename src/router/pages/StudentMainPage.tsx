@@ -45,7 +45,7 @@ export default function StudentMainPage() {
     actionLabel="Intentar de nuevo"
     onAction={() => error}
   />;
-  console.log(planSeleccionado)
+  //console.log(planSeleccionado)
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <PlanSelect

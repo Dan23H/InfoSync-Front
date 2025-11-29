@@ -173,8 +173,8 @@ export default function AddPlan({ onClose }: AddPlanProps) {
         semesters: plan.semesters,
         userId: user._id
       };
-      const created = await createPensum(body);
-      console.log("Creado:", created);
+      await createPensum(body);
+      //console.log("Creado:", created);
       alert("Plan creado exitosamente!");
 
       // reset de información

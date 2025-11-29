@@ -6,3 +6,4 @@ export {default as DislikeSelected} from "./DislikeSelected.svg";
 export {default as DislikeUnselected} from "./DislikeUnselected.svg";
 export {default as EditSVG} from "./EditSVG.svg";
 export {default as DeleteSVG} from "./DeleteSVG.svg";
+export {default as ReportSVG} from "./ReportSVG.svg";

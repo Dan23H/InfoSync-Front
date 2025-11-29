@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Box, Typography, Avatar, TextField, Divider, IconButton, Button, Snackbar, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
+import { Box, Typography, Avatar, TextField, Divider, IconButton, Button, Snackbar, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions, Tooltip } from "@mui/material";
+import { ReportSVG } from "../../../../assets";
 import type { Comment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import SubCommentItem from "./SubcommentItem";
@@ -57,7 +58,15 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
                 <Typography variant="caption" color="text.secondary">
                     {new Date(comment.createdAt).toLocaleString()}
                 </Typography>
-                <IconButton size="small" sx={{ ml: "auto" }} onClick={() => setReportDialogOpen(true)}>Report</IconButton>
+                                <Tooltip
+                                    title="Reportar"
+                                    placement="left"
+                                    PopperProps={{ modifiers: [{ name: 'offset', options: { offset: [0, 4] } }] }}
+                                >
+                                    <IconButton size="small" sx={{ ml: "auto" }} onClick={() => setReportDialogOpen(true)} aria-label="Reportar">
+                                        <img src={ReportSVG} alt="report" width={18} height={18} />
+                                    </IconButton>
+                                </Tooltip>
             </Box>
 
             {/* Texto del comentario */}

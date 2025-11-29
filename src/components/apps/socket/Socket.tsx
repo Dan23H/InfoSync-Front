@@ -10,7 +10,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     const WSS_API_URL = import.meta.env.VITE_WSS_API_URL || import.meta.env.WSS_API_URL || 'ws://localhost:3000';
 
-    console.log('Socket WSS_API_URL resolved to:', WSS_API_URL);
+    //console.log('Socket WSS_API_URL resolved to:', WSS_API_URL);
 
     // Create the socket once via hook
     const socket = useSocket(WSS_API_URL, {

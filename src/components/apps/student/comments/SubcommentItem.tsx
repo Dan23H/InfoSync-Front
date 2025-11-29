@@ -1,4 +1,5 @@
-import { Box, Typography, Avatar, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, DialogActions, Button, Snackbar } from "@mui/material";
+import { Box, Typography, Avatar, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, DialogActions, Button, Snackbar, Tooltip } from "@mui/material";
+import { ReportSVG } from "../../../../assets";
 import type { SubComment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useState } from "react";
@@ -52,19 +53,25 @@ export default function SubCommentItem({ subComment, parentCommentId }: Subcomme
         <Typography variant="caption" color="text.secondary">
           {new Date(subComment.createdAt).toLocaleString()}
         </Typography>
+        <Tooltip
+          title="Reportar"
+          placement="left"
+        >
+          <IconButton
+            size="small"
+            onClick={() => {
+              setReportDialogOpen(true);
+            }}
+            sx={{ ml: "auto" }}
+            aria-label="Reportar"
+          >
+            <img src={ReportSVG} alt="report" width={16} height={16} />
+          </IconButton>
+        </Tooltip>
       </Box>
       <Typography variant="body2" sx={{ ml: 4 }}>
         {subComment.commentary}
       </Typography>
-      <IconButton
-        size="small"
-        onClick={() => {
-            setReportDialogOpen(true);
-          }}
-        sx={{ ml: 1 }}
-      >
-        Reportar
-      </IconButton>
 
       <Dialog open={reportDialogOpen} onClose={() => setReportDialogOpen(false)}>
         <DialogTitle>Reportar subcomentario</DialogTitle>

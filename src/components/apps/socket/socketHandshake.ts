@@ -19,13 +19,13 @@ export const sendSocketHandshake = (
     }
 
     const parsedUser = JSON.parse(user);
-    console.log("Parsed user: ", parsedUser);
+    //console.log("Parsed user: ", parsedUser);
 
     socket.emit("handshake", { 
         token,
         user: parsedUser
     }, (uid: string, users: string[]) => {
-        console.log("Handshake acknowledged:", uid, users);
+        //console.log("Handshake acknowledged:", uid, users);
 
         SocketDispatch({ type: "update_uid", payload: uid });
         SocketDispatch({ type: "update_users", payload: users });
