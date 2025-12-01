@@ -52,6 +52,8 @@ export default function Modding() {
     fetchReports();
   }, []);
 
+  const { user } = useAuth();
+
   const handleViewContent = async (report: any) => {
     let content = null;
     if (report.targetType === "post") {
@@ -107,26 +109,27 @@ export default function Modding() {
     try {
       // MEDIDA TEMPORAL: Eliminación en cascada desde el frontend
       if (moderation.deleteContent && modalContent) {
+        const currentUserId = user?.userId || user?._id || "";
         if (modalReport.targetType === "post") {
-          await deletePost(modalContent._id, modalContent.userId);
+          await deletePost(modalContent._id, currentUserId);
           const comments = await getComments(modalContent._id);
           for (const comment of comments) {
             if (comment.subComments && comment.subComments.length > 0) {
               for (const sub of comment.subComments) {
-                await deleteSubComment(comment._id, sub._id, sub.userId);
+                await deleteSubComment(comment._id, sub._id, currentUserId);
               }
             }
-            await deleteComment(comment._id, comment.userId);
+            await deleteComment(comment._id, currentUserId);
           }
         } else if (modalReport.targetType === "comment") {
           if (modalContent.subComments && modalContent.subComments.length > 0) {
             for (const sub of modalContent.subComments) {
-              await deleteSubComment(modalContent._id, sub._id, sub.userId);
+              await deleteSubComment(modalContent._id, sub._id, currentUserId);
             }
           }
-          await deleteComment(modalContent._id, modalContent.userId);
+          await deleteComment(modalContent._id, currentUserId);
         } else if (modalReport.targetType === "subcomment") {
-          await deleteSubComment(modalContent.commentId, modalContent._id, modalContent.userId);
+          await deleteSubComment(modalContent.commentId, modalContent._id, currentUserId);
         }
       }
       if (moderation.banUser && modalContent?.userId) {
@@ -164,11 +167,10 @@ export default function Modding() {
     }
   };
 
-  const { user } = useAuth();
-
   const handleDeleteReport = async (reportId: string) => {
     if (!window.confirm("¿Seguro que quieres borrar este reporte?")) return;
     try {
+      const { user } = useAuth();
       if (!user) {
         alert("No autorizado. Inicia sesión de nuevo.");
         return;

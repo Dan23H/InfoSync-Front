@@ -4,6 +4,7 @@ import CommentItem from "../../student/comments/CommentItem";
 import type { ReportModalProps } from "../../../../models";
 import { useNavigate } from "react-router-dom";
 import ReportedSubComment from "../../student/comments/ReportedSubComment";
+import { slugify } from "../../../../utils/slugify";
 
 export default function ReportModal({
     open,
@@ -157,9 +158,9 @@ export default function ReportModal({
                             if (!modalReport || !modalContent) return;
                             let url = "";
                             if (modalReport.targetType === "post") {
-                                url = `/student/${modalContent.pensumId}/${modalContent.course}/${modalContent._id}`;
+                                url = `/student/${modalContent.pensumId}/${slugify(modalContent.course)}/${modalContent._id}`;
                             } else if (modalReport.targetType === "comment" || modalReport.targetType === "subcomment") {
-                                url = `/student/${modalContent.pensumId}/${modalContent.course}/${modalContent.postId}`;
+                                url = `/student/${modalContent.pensumId}/${slugify(modalContent.course)}/${modalContent.postId}`;
                             }
                             navigate(url);
                         }}
