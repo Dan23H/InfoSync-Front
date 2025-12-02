@@ -19,6 +19,8 @@ export default function Modding() {
   const [reviewDescription, setReviewDescription] = useState("");
   const [filter, setFilter] = useState<"Pending" | "Resolved">("Pending");
 
+  const { user } = useAuth();
+
   // Opciones de filtro
   const FILTERS = [
     { value: "Pending", label: "Pendientes", color: "#ffeaea" },
@@ -26,33 +28,38 @@ export default function Modding() {
   ];
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const data = await getReports();
-        setReports(data);
-
-        // Nombres de los autores
-        const uniqueUserIds = [...new Set(data.map(r => r.userId))];
-        const authorMap: Record<string, string> = {};
-        await Promise.all(uniqueUserIds.map(async (id) => {
-          try {
-            const user = await getUserById(id);
-            authorMap[id] = user.userName;
-          } catch {
-            authorMap[id] = id;
-          }
-        }));
-        setAuthors(authorMap);
-      } catch (err) {
-        console.error("Error cargando reportes", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReports();
+    // noop: replaced by fetchReports defined outside useEffect
   }, []);
 
-  const { user } = useAuth();
+  // Extracted fetchReports so handlers can refresh data after actions
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const data = await getReports();
+      setReports(data);
+
+      // Nombres de los autores
+      const uniqueUserIds = [...new Set(data.map(r => r.userId))];
+      const authorMap: Record<string, string> = {};
+      await Promise.all(uniqueUserIds.map(async (id) => {
+        try {
+          const user = await getUserById(id);
+          authorMap[id] = user.userName;
+        } catch {
+          authorMap[id] = id;
+        }
+      }));
+      setAuthors(authorMap);
+    } catch (err) {
+      console.error("Error cargando reportes", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
 
   const handleViewContent = async (report: any) => {
     let content = null;
@@ -107,9 +114,20 @@ export default function Modding() {
     if (!modalReport) return;
     setActionLoading(true);
     try {
-      // MEDIDA TEMPORAL: Eliminación en cascada desde el frontend
+      const currentUserId = user?.userId || user?._id || "";
+
+      // First, mark the report as resolved using the admin's id
+      await resolveReport(modalReport._id, {
+        userId: currentUserId,
+        state: "Resolved",
+        reviewDescription: reviewDescription
+      });
+
+      // Refresh reports so UI reflects resolver/timestamps
+      await fetchReports();
+
+      // Now perform deletion/moderation actions (if requested) using admin id
       if (moderation.deleteContent && modalContent) {
-        const currentUserId = user?.userId || user?._id || "";
         if (modalReport.targetType === "post") {
           await deletePost(modalContent._id, currentUserId);
           const comments = await getComments(modalContent._id);
@@ -135,16 +153,9 @@ export default function Modding() {
       if (moderation.banUser && modalContent?.userId) {
         await updateUserStatus(modalContent.userId, "banned");
       }
-      const currentUserId = user?.userId || user?._id || "";
-      await resolveReport(modalReport._id, {
-        userId: currentUserId,
-        state: "Resolved",
-        reviewDescription: reviewDescription
-      });
-      alert("Reporte actualizado correctamente.");
       setModalOpen(false);
     } catch (err) {
-      alert("Error al ejecutar acciones/moderar el reporte.");
+      alert("Error al ejecutar acciones/moderar el reporte. " + err);
     } finally {
       setActionLoading(false);
     }
@@ -160,6 +171,7 @@ export default function Modding() {
         userId: currentUserId,
         reviewDescription
       });
+      await fetchReports();
       alert("Reporte desestimado.");
       setModalOpen(false);
     } catch (err) {
@@ -172,7 +184,6 @@ export default function Modding() {
   const handleDeleteReport = async (reportId: string) => {
     if (!window.confirm("¿Seguro que quieres borrar este reporte?")) return;
     try {
-      const { user } = useAuth();
       if (!user) {
         alert("No autorizado. Inicia sesión de nuevo.");
         return;
