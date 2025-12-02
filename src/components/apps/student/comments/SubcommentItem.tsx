@@ -1,5 +1,5 @@
-import { Box, Typography, Avatar, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, DialogActions, Button, Snackbar, Tooltip } from "@mui/material";
-import { ReportSVG } from "../../../../assets";
+import { Box, Typography, Avatar, MenuItem, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, DialogActions, Button, Snackbar } from "@mui/material";
+// import { ReportSVG } from "../../../../assets"; // Descomentar para habilitar el ícono de reporte
 import type { SubComment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useState } from "react";
@@ -53,21 +53,25 @@ export default function SubCommentItem({ subComment, parentCommentId }: Subcomme
         <Typography variant="caption" color="text.secondary">
           {new Date(subComment.createdAt).toLocaleString()}
         </Typography>
-        <Tooltip
-          title="Reportar"
-          placement="left"
-        >
-          <IconButton
-            size="small"
-            onClick={() => {
-              setReportDialogOpen(true);
-            }}
-            sx={{ ml: "auto" }}
-            aria-label="Reportar"
+        {
+        /* // Descomentar para habilitar la funcionalidad de reporte para subcomentarios
+          <Tooltip
+            title="Reportar"
+            placement="left"
           >
-            <img src={ReportSVG} alt="report" width={16} height={16} />
-          </IconButton>
-        </Tooltip>
+            <IconButton
+              size="small"
+              onClick={() => {
+                setReportDialogOpen(true);
+              }}
+              sx={{ ml: "auto" }}
+              aria-label="Reportar"
+            >
+              <img src={ReportSVG} alt="report" width={16} height={16} />
+            </IconButton>
+          </Tooltip>
+        */
+        }
       </Box>
       <Typography variant="body2" sx={{ ml: 4 }}>
         {subComment.commentary}
