@@ -135,8 +135,9 @@ export default function Modding() {
       if (moderation.banUser && modalContent?.userId) {
         await updateUserStatus(modalContent.userId, "banned");
       }
+      const currentUserId = user?.userId || user?._id || "";
       await resolveReport(modalReport._id, {
-        userId: modalReport.userId,
+        userId: currentUserId,
         state: "Resolved",
         reviewDescription: reviewDescription
       });
@@ -153,9 +154,10 @@ export default function Modding() {
     if (!modalReport) return;
     setActionLoading(true);
     try {
+      const currentUserId = user?.userId || user?._id || "";
       await resolveReport(modalReport._id, {
         state: "Dismissed",
-        userId: modalReport.userId,
+        userId: currentUserId,
         reviewDescription
       });
       alert("Reporte desestimado.");
