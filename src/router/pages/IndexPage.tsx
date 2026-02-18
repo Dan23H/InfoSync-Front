@@ -22,61 +22,63 @@ export default function IndexPage() {
     };
 
     return (
-        <motion.div
-            initial="initial"
-            animate={isExiting ? "exit" : "initial"}
-        >
-            <Grid container justifyContent="center" alignItems="center" style={{ height: "100vh" }}>
-                <Grid size={{ xs: 12 }} textAlign="center" mb={2}>
-                    <motion.div
-                        initial="hidden"
-                        animate={isExiting ? "exitTop" : "visible"}
-                        variants={buttonVariants}
-                    >
-                        <Typography variant="h1" align="center">
-                            <Typewriter
-                                words={["Bienvenid@ a InfoSync", "Mejora tu conocimiento", "Comparte con tus compañeros", "Tu espacio de aprendizaje", "Bienvenid@ a InfoSync"]}
-                                cursor
-                                cursorStyle="|"
-                                typeSpeed={70}
-                                loop={1}
-                                deleteSpeed={50}
-                                delaySpeed={2000}
-                            />
-                        </Typography>
-                    </motion.div>
-                    <motion.div
-                        initial="hidden"
-                        animate={isExiting ? "exitLeft" : "visible"}
-                        variants={buttonVariants}
-                        style={{ display: "inline-block", marginRight: "50px" }}
-                    >
-                        <Button
-                            variant="contained"
-                            color="error"
-                            sx={{ mt: 4 }}
-                            onClick={() => handleNavigation("/login")}
+        <main role="main">
+            <motion.div
+                initial="initial"
+                animate={isExiting ? "exit" : "initial"}
+            >
+                <Grid container justifyContent="center" alignItems="center" style={{ height: "100vh" }}>
+                    <Grid size={{ xs: 12 }} textAlign="center" mb={2}>
+                        <motion.div
+                            initial="hidden"
+                            animate={isExiting ? "exitTop" : "visible"}
+                            variants={buttonVariants}
                         >
-                            Inicia sesión
-                        </Button>
-                    </motion.div>
-                    <motion.div
-                        initial="hidden"
-                        animate={isExiting ? "exitRight" : "visible"}
-                        variants={buttonVariants}
-                        style={{ display: "inline-block" }}
-                    >
-                        <Button
-                            variant="text"
-                            color="error"
-                            sx={{ mt: 4 }}
-                            onClick={() => handleNavigation("/register")}
+                            <Typography variant="h1" align="center">
+                                <Typewriter
+                                    words={["Bienvenid@ a InfoSync", "Mejora tu conocimiento", "Comparte con tus compañeros", "Tu espacio de aprendizaje", "Bienvenid@ a InfoSync"]}
+                                    cursor
+                                    cursorStyle="|"
+                                    typeSpeed={70}
+                                    loop={1}
+                                    deleteSpeed={50}
+                                    delaySpeed={2000}
+                                />
+                            </Typography>
+                        </motion.div>
+                        <motion.div
+                            initial="hidden"
+                            animate={isExiting ? "exitLeft" : "visible"}
+                            variants={buttonVariants}
+                            style={{ display: "inline-block", marginRight: "50px" }}
                         >
-                            Registrarse
-                        </Button>
-                    </motion.div>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                sx={{ mt: 4 }}
+                                onClick={() => handleNavigation("/login")}
+                            >
+                                Inicia sesión
+                            </Button>
+                        </motion.div>
+                        <motion.div
+                            initial="hidden"
+                            animate={isExiting ? "exitRight" : "visible"}
+                            variants={buttonVariants}
+                            style={{ display: "inline-block" }}
+                        >
+                            <Button
+                                variant="text"
+                                color="error"
+                                sx={{ mt: 4 }}
+                                onClick={() => handleNavigation("/register")}
+                            >
+                                Registrarse
+                            </Button>
+                        </motion.div>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </motion.div>
+            </motion.div>
+        </main>
     );
 }

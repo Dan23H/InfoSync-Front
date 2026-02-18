@@ -1,3 +1,4 @@
+import "../../styles/navbar.css";
 import { AppBar, Toolbar, Button, Box, Typography, Menu, MenuItem, Avatar, IconButton, TextField, InputAdornment } from "@mui/material";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -71,8 +72,25 @@ export default function Navbar() {
     }
   };
 
+  const handleHomeClick = () => {
+    if (location.pathname.startsWith("/student")) {
+      const pathSegments = location.pathname.split("/").filter(Boolean);
+
+      // Si la URL tiene más de 3 segmentos, retrocede un nivel
+      if (pathSegments.length > 3) {
+        const newPath = `/${pathSegments.slice(0, 3).join("/")}`;
+        navigate(newPath);
+      } else {
+        // Si no, redirige a /student
+        navigate("/student");
+      }
+    } else {
+      navigate("/student");
+    }
+  };
+
   return (
-    <AppBar position="static" color="default" elevation={1}>
+    <AppBar position="static" color="primary" elevation={1}>
       <Toolbar>
         <Box sx={{ flexGrow: 1, display: "flex", gap: 2, alignItems: "center" }}>
           {/* Home / Cambiar vista */}
@@ -82,7 +100,7 @@ export default function Navbar() {
                 color="inherit"
                 onClick={() => navigate(isStudentView ? "/admin" : "/student")}
               >
-                {isStudentView ? "Ir a vista administrador" : "Ir a vista estudiante"}
+                <Typography>{isStudentView ? "Ir a vista administrador" : "Ir a vista estudiante"}</Typography>
               </Button>
               {isStudentView && (
                 <>
@@ -99,8 +117,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Button color="inherit" onClick={() => navigate("/student")}>
-                {courseName ? `Ingeniería Informática - ${courseName}` : "Home"}
+              <Button color="inherit" onClick={handleHomeClick}>
+                {courseName ? `${courseName}` : "Ingeniería Informática"}
               </Button>
               {!isProfileRoute && (
                 <Button color="inherit" onClick={handleNewPost}>
@@ -113,6 +131,7 @@ export default function Navbar() {
           {location.pathname.startsWith("/student") && (
 
             <TextField
+              className="navbar-search"
               size="small"
               placeholder="Buscar posts..."
               value={search}
@@ -126,7 +145,6 @@ export default function Navbar() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <Button
-                      color="inherit"
                       onClick={() => handleSearch(search)}
                     >
                       Buscar

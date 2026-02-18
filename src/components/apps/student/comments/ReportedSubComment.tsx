@@ -1,3 +1,4 @@
+import "../../../../styles/student-comments.css";
 import { Box, Typography, Avatar } from "@mui/material";
 import type { SubComment } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
@@ -11,16 +12,16 @@ export default function ReportedSubComment({ subComment }: ReportedSubCommentPro
   console.log("ReportedSubComment - subComment:", subComment);
 
   return (
-    <Box sx={{ mb: 2, pl: 1 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Avatar sx={{ width: 24, height: 24 }}>
+    <Box className="reported-subcomment">
+      <Box style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <Avatar className="avatar">
           {subAuthor ? subAuthor.userName[0].toUpperCase() : subComment.userId[0]}
         </Avatar>
-        <Typography variant="subtitle2">
+        <Typography variant="subtitle2" className="author">
           {subAuthor ? subAuthor.userName : loading ? "Cargando..." : "Desconocido"}
         </Typography>
       </Box>
-      <Typography variant="body2" sx={{ ml: 4 }}>
+      <Typography variant="body2" className="commentary">
         {subComment.commentary}
       </Typography>
     </Box>

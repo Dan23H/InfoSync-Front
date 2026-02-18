@@ -1,3 +1,4 @@
+import "../../../../styles/student-comments.css";
 import { Box, Typography, Avatar, MenuItem, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, DialogActions, Button, Snackbar } from "@mui/material";
 // import { ReportSVG } from "../../../../assets"; // Descomentar para habilitar el ícono de reporte
 import type { SubComment } from "../../../../models";
@@ -42,9 +43,9 @@ export default function SubCommentItem({ subComment, parentCommentId }: Subcomme
   };
 
   return (
-    <Box sx={{ mb: 1 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Avatar sx={{ width: 24, height: 24 }}>
+    <Box className="subcomment-item">
+      <Box style={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Avatar className="avatar">
           {subAuthor ? subAuthor.userName[0] : subComment.userId[0]}
         </Avatar>
         <Typography variant="subtitle2">

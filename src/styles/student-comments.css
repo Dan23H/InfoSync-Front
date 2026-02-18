@@ -1,0 +1,36 @@
+/* Styles for student comments section */
+
+.comment-item {
+  margin-bottom: 1rem;
+}
+.comment-item .avatar {
+  width: 24px;
+  height: 24px;
+}
+
+.subcomment-item {
+  margin-bottom: 0.5rem;
+}
+.subcomment-item .avatar {
+  width: 24px;
+  height: 24px;
+}
+
+.reported-subcomment {
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+.reported-subcomment .avatar {
+  width: 24px;
+  height: 24px;
+}
+.reported-subcomment .author {
+  font-weight: bold;
+}
+.reported-subcomment .commentary {
+  margin-left: 2rem;
+}
+
+.comments-section {
+  margin-top: 1.5rem;
+}

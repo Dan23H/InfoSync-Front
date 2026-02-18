@@ -1,0 +1,19 @@
+/* Navbar custom styles */
+
+.navbar-search .MuiInputBase-root {
+  border: 1px solid #fff !important;
+  color: #fff !important;
+}
+
+.navbar-search .MuiInputBase-input::placeholder {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.navbar-search .MuiOutlinedInput-notchedOutline {
+  border-color: #fff !important;
+}
+
+.navbar-search .MuiButton-root {
+  color: #fff !important;
+}

@@ -1,3 +1,4 @@
+import "../../../../styles/student-courses.css";
 import { Box, Divider, Typography } from "@mui/material";
 import CourseCard from "./CourseCard";
 import { slugify } from "../../../../utils/slugify";

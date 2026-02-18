@@ -1,8 +1,9 @@
+import "../../../../styles/student-courses.css";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 export default function PlanSelect({ plans, value, onChange }: any) {
   return (
-    <FormControl fullWidth>
+    <FormControl className="select-fullwidth">
       <InputLabel>Plan</InputLabel>
       <Select value={value ?? ""} label="Plan" onChange={(e) => onChange(e.target.value)}>
         {plans.map((p: any) => (

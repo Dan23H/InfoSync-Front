@@ -1,3 +1,4 @@
+import "../../../../styles/student-courses.css";
 import { Box, List, ListItemButton, Paper, TextField, Typography } from "@mui/material";
 import { useRef } from "react";
 import { useDeselect } from "../../../../hooks/useDeselect";
@@ -7,7 +8,7 @@ export default function CourseSearch({ value, onChange, suggestions, showSuggest
   useDeselect(wrapperRef, () => setShowSuggestions(false));
 
   return (
-    <Box sx={{ position: "relative" }} ref={wrapperRef}>
+    <Box className="course-search-wrapper" ref={wrapperRef}>
       <TextField
         label="Asignatura"
         value={value}
@@ -19,28 +20,18 @@ export default function CourseSearch({ value, onChange, suggestions, showSuggest
         fullWidth
       />
       {showSuggestions && suggestions.length > 0 && (
-        <Paper
-          sx={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            zIndex: 10,
-            maxHeight: 200,
-            overflowY: "auto",
-          }}
-        >
+        <Paper className="course-search-suggestions">
           <List>
             {suggestions.map((s: string, i: number) => (
               <ListItemButton
-                sx={{ fontSize: 16 }}
+                className="course-search-suggestion"
                 key={i}
                 onClick={() => {
                   onChange(s);
                   setShowSuggestions(false);
                 }}
               >
-                <Typography fontFamily={"sans-serif"}>
+                <Typography className="course-search-suggestion">
                   {s}
                 </Typography>
               </ListItemButton>

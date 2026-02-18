@@ -223,7 +223,7 @@ export default function Modding() {
         <Box sx={{
           display: "flex",
           borderRadius: 3,
-          overflow: "hidden",
+          overflow: "auto",
           boxShadow: 1,
           border: "1px solid #eee",
         }}>

@@ -1,0 +1,70 @@
+/* Styles for student courses section */
+
+.course-card {
+  position: relative;
+  min-height: 150px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+.course-card:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.course-card .semester {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.course-card .plan {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+}
+.course-card .type-bar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+}
+.type-bar.type-b {
+  background-color: orange;
+}
+.type-bar.type-a {
+  background-color: blue;
+}
+
+.courses-by-semester {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.5rem;
+}
+
+.course-search-wrapper {
+  position: relative;
+}
+.course-search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.course-search-suggestion {
+  font-size: 16px;
+  font-family: sans-serif;
+}
+
+.select-fullwidth {
+  width: 100%;
+}
+
+.course-section-card {
+  margin-bottom: 1rem;
+}

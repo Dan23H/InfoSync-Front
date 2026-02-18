@@ -20,18 +20,13 @@ export default function PostSidebarItem({ post, plan, course, isActive }: PostSi
   const recommendation = getRecommendationLabel(score, totalVotes);
   const recommendationLabel = recommendation.label;
   const recommendationColor = recommendation.color;
-
   return (
     <ListItem
       key={post._id}
       component={Link}
       to={`/student/${plan}/${course}/${post._id}`}
+      className="post-sidebar-item"
       sx={{
-        textDecoration: "none",
-        border: "1px solid rgba(255,0,0,0.25)",
-        bgcolor: "#AB9B9B",
-        borderRadius: 1,
-        mb: 1,
         "&:hover": { bgcolor: "#ff000026" },
         color: "text.primary",
         flexDirection: "column",
@@ -44,12 +39,12 @@ export default function PostSidebarItem({ post, plan, course, isActive }: PostSi
         }),
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-        <Avatar sx={{ width: 15, height: 15, mr: 1 }} />
+      <Box style={{ display: "flex", alignItems: "center", marginBottom: 1 }}>
+        <Avatar className="avatar" />
         <Typography variant="body2" fontWeight="bold">
           {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
         </Typography>
-        <Typography variant="body2" sx={{ ml: 1 }}>
+        <Typography variant="body2" style={{ marginLeft: 4 }}>
           {new Date(post.createdAt).toLocaleDateString()}
         </Typography>
       </Box>
@@ -57,15 +52,14 @@ export default function PostSidebarItem({ post, plan, course, isActive }: PostSi
       <Typography variant="subtitle1" fontWeight="bold">
         {post.title}
       </Typography>
-
       <Typography variant="body2" color="text.secondary" noWrap>
         {post.description}
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5 }}>
+      <Box style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
         <Typography variant="caption">{commentsCount} comentarios</Typography>
         {post.type === "S" && (
-          <Typography variant="caption" sx={{color: recommendationColor}}>
+          <Typography variant="caption" style={{ color: recommendationColor }}>
             {recommendationLabel}
           </Typography>
         )}

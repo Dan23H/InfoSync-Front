@@ -1,5 +1,5 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, Select, Divider } from "@mui/material";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import type { Post } from "../../../../models";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
@@ -9,6 +9,7 @@ import { createReport, deletePost, updatePost } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import ModalPost from "./ModalPost";
 import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
+import CopyUrlButton from "./CopyUrlButton";
 
 interface PostCardProps {
   post: Post;
@@ -20,9 +21,6 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [squareMounted, setSquareMounted] = useState(false);
-  const [squareVisible, setSquareVisible] = useState(false);
-  const hideTimerRef = useRef<number | null>(null);
 
   const { user: author, loading } = useAuthor(post.userId);
 
@@ -92,19 +90,21 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     }
   };
 
+  const URL = `${window.location.origin}/student/${post.pensumId}/${slugify(post.course)}/${post._id}`;
+
   return (
     <>
-      <Card sx={{ mb: 2, backgroundColor: "#D9D9D9", border: "1px solid #ccc", borderRadius: 2, boxShadow: 1 }}>
+      <Card className="post-card">
         <CardContent
           component={Link}
           to={`/student/${post.pensumId}/${slugify(post.course)}/${post._id}`}
-          sx={{ textDecoration: "none", color: "inherit" }}
+          style={{ textDecoration: "none", color: "inherit" }}
         >
           {/* Encabezado */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, ml: 2, mr: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Avatar sx={{ width: 24, height: 24, bgcolor: "brown" }} />
-              <Typography variant="body2" fontWeight="bold">
+          <Box className="post-header">
+            <Box style={{ display: "flex", alignItems: "center", gap: 4, lineHeight: 1.5 }}>
+              <Avatar className="avatar" />
+              <Typography variant="body2" className="author">
                 {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
               </Typography>
               <Typography variant="body2">
@@ -112,11 +112,11 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               </Typography>
             </Box>
             {/* Menú de opciones */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <Chip
                 label={post.type === "Q" ? "Pregunta" : "Sugerencia"}
                 size="small"
-                sx={{ bgcolor: post.type === "Q" ? "#787777" : "#006387", color: "#fff" }}
+                style={{ backgroundColor: post.type === "Q" ? "#252525" : "#006387", color: "#fff" }}
               />
               <IconButton
                 onClick={(e) => {
@@ -167,85 +167,19 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           </Box>
 
           {/* Contenido del post */}
-          <Typography variant="h6" sx={{ ml: 2, mr: 2, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{post.title}</Typography>
-          <Typography variant="body2" sx={{ mt: 1, ml: 2, mr: 2, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>
+          <Typography variant="h6" className="post-title">{post.title}</Typography>
+          <Typography variant="body2" className="post-description">
             {post.description}
           </Typography>
         </CardContent>
 
         {/* Footer */}
-        <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Typography variant="body2" sx={{ userSelect: "none" }}>
+        <CardActions className="post-footer">
+          <Box style={{ display: "flex", gap: 8 }}>
+            <Typography variant="body2" style={{ userSelect: "none", alignSelf: "center", marginLeft: 4 }}>
               {commentsCount} – Comentarios
             </Typography>
-            <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-              {squareMounted && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "100%",
-                    transform: squareVisible ? "translate(0, -50%)" : "translate(5px, -50%)",
-                    width: 20,
-                    height: 20,
-                    border: "2px solid green",
-                    borderRadius: 1,
-                    backgroundColor: "transparent",
-                    transition: "transform 300ms cubic-bezier(.42,0,.58,1), opacity 300ms",
-                    opacity: squareVisible ? 1 : 0,
-                    pointerEvents: "none",
-                    boxSizing: "border-box",
-                    zIndex: 10,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'green',
-                    fontSize: '1rem',
-                    lineHeight: 1,
-                  }}
-                >
-                  <span aria-hidden="true">✔</span>
-                </Box>
-              )}
-
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: "red",
-                  borderColor: "red",
-                  backgroundColor: "transparent",
-                  ":hover": {
-                    backgroundColor: "rgba(255, 0, 0, 0.1)",
-                    borderColor: "darkred",
-                  },
-                }}
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-
-                  // reset previous timer
-                  if (hideTimerRef.current) {
-                    window.clearTimeout(hideTimerRef.current);
-                    hideTimerRef.current = null;
-                  }
-                  if (!squareMounted) {
-                    setSquareMounted(true);
-                    requestAnimationFrame(() => setSquareVisible(true));
-                  } else {
-                    setSquareVisible(true);
-                  }
-
-                  hideTimerRef.current = window.setTimeout(() => {
-                    setSquareVisible(false);
-                    window.setTimeout(() => setSquareMounted(false), 300);
-                    hideTimerRef.current = null;
-                  }, 5000);
-                }}
-              >
-                Copiar URL
-              </Button>
-            </Box>
+            <CopyUrlButton to={URL} />
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {post.type === "S" && (

@@ -31,37 +31,39 @@ export default function PostPage() {
   if (!post) return <Typography>No se encontró el post</Typography>;
 
   return (
-    <Grid container spacing={2}>
-      {/* Sidebar */}
-      <Grid size={{ xs: 12, md: 3 }}>
-        <PostSidebar posts={posts} postId={postId} plan={plan!} course={course!} />
-      </Grid>
+    <main role="main">
+      <Grid container spacing={2}>
+        {/* Sidebar */}
+        <Grid size={{ xs: 12, md: 3 }}>
+          <PostSidebar posts={posts} postId={postId} plan={plan!} course={course!} />
+        </Grid>
 
-      {/* Contenido principal */}
-      <Grid size={{ xs: 12, md: 9 }} sx={{ height: "98vh", overflowY: "auto" }}>
-        <PostContent
-          post={post}
-          onImageClick={(i) => {
-            setCurrentIndex(i);
-            setOpenImages(true);
-          }}
+        {/* Contenido principal */}
+        <Grid size={{ xs: 12, md: 9 }} sx={{ height: "98vh", overflowY: "auto" }}>
+          <PostContent
+            post={post}
+            onImageClick={(i) => {
+              setCurrentIndex(i);
+              setOpenImages(true);
+            }}
+          />
+        </Grid>
+
+        {/* Modal de imágenes */}
+        <ImageModal
+          images={post.images || []}
+          open={openImages}
+          currentIndex={currentIndex}
+          onClose={() => setOpenImages(false)}
+          onPrev={() =>
+            setCurrentIndex((prev) => (prev === 0 ? post.images.length - 1 : prev - 1))
+          }
+          onNext={() =>
+            setCurrentIndex((prev) => (prev === post.images.length - 1 ? 0 : prev + 1))
+          }
+          setCurrentIndex={setCurrentIndex}
         />
       </Grid>
-
-      {/* Modal de imágenes */}
-      <ImageModal
-        images={post.images || []}
-        open={openImages}
-        currentIndex={currentIndex}
-        onClose={() => setOpenImages(false)}
-        onPrev={() =>
-          setCurrentIndex((prev) => (prev === 0 ? post.images.length - 1 : prev - 1))
-        }
-        onNext={() =>
-          setCurrentIndex((prev) => (prev === post.images.length - 1 ? 0 : prev + 1))
-        }
-        setCurrentIndex={setCurrentIndex}
-      />
-    </Grid>
+    </main>
   );
 }

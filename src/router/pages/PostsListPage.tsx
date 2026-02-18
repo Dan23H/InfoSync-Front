@@ -1,14 +1,14 @@
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { usePosts } from "../../hooks/usePosts";
 import { usePensums } from "../../hooks/usePensums";
 import { useEffect, useState, useContext } from "react";
-import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid, Fab } from "@mui/material";
+import { Typography, IconButton, Card, CardHeader, CardContent, Collapse, Grid } from "@mui/material";
 import SearchResults from "../../components/apps/student/posts/SearchResults";
 import PostCard from "../../components/apps/student/posts/PostCard";
 import { usePlan } from "../../context/PlanContext";
 import { useAuth } from "../../context/AuthContext";
 import SocketContext from "../../context/SocketContext";
-import { AiFillEye, AiFillEyeInvisible, AiFillHome } from "react-icons/ai";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 export default function PostsListPage() {
   const { plan: planFromUrl, course } = useParams<{ plan: string; course: string }>();
@@ -35,7 +35,6 @@ export default function PostsListPage() {
   const [showQuestions, setShowQuestions] = useState(true);
   const [showSuggestions, setShowSuggestions] = useState(true);
 
-  const navigate = useNavigate();
   useContext(SocketContext);
 
   useEffect(() => {
@@ -62,17 +61,8 @@ export default function PostsListPage() {
   const gridSize = openedCount === 2 ? 6 : 12;
 
   return (
-    <>
+    <main role="main">
       <Grid container spacing={2}>
-        <Fab
-          color="error"
-          aria-label="inicio"
-          onClick={() => navigate("/student")}
-          sx={{ position: "fixed", bottom: 16, left: 16 }}
-        >
-          {<AiFillHome />}
-        </Fab>
-
         {q ? (
           <>
             {/* Resultados de la Query */}
@@ -88,7 +78,8 @@ export default function PostsListPage() {
                   onClick={() => setShowQuestions((prev) => !prev)}
                   sx={{ ":hover": { cursor: "pointer" } }}
                   action={
-                    <IconButton>
+                    <IconButton aria-label={showQuestions ? "Ocultar preguntas" : "Mostrar preguntas"}>
+                      <Typography variant="body2" sx={{ mr: 1 }}>{showQuestions ? "Ocultar preguntas" : "Mostrar preguntas"}</Typography>
                       {showQuestions ? <AiFillEyeInvisible /> : <AiFillEye />}
                     </IconButton>
                   }
@@ -113,7 +104,8 @@ export default function PostsListPage() {
                   onClick={() => setShowSuggestions((prev) => !prev)}
                   sx={{ ":hover": { cursor: "pointer" } }}
                   action={
-                    <IconButton>
+                    <IconButton aria-label={showSuggestions ? "Ocultar sugerencias" : "Mostrar sugerencias"}>
+                      <Typography variant="body2" sx={{ mr: 1 }}>{showSuggestions ? "Ocultar sugerencias" : "Mostrar sugerencias"}</Typography>
                       {showSuggestions ? <AiFillEyeInvisible /> : <AiFillEye />}
                     </IconButton>
                   }
@@ -132,6 +124,6 @@ export default function PostsListPage() {
           </>
         )}
       </Grid>
-    </>
+    </main>
   );
 }

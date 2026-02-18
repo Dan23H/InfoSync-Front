@@ -1,3 +1,4 @@
+import "../../../../styles/student-comments.css";
 import { useContext, useEffect, useState } from "react";
 import { Box, Typography, Avatar, TextField, Button } from "@mui/material";
 import { getComments, createComment, createSubComment } from "../../../../api";
@@ -151,7 +152,7 @@ export default function CommentsSection({ postId, userId, onCommentCountChange }
   };
 
   return (
-    <Box mt={3}>
+    <Box className="comments-section">
       <Typography variant="h6" gutterBottom>
         Comentarios
       </Typography>

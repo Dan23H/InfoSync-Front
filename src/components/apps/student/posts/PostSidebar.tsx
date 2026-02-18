@@ -1,6 +1,7 @@
 import { Card, CardContent, List, Typography } from "@mui/material";
 import type { Post } from "../../../../models";
 import PostSidebarItem from "./PostSidebarItem";
+import "../../../../styles/student-posts.css";
 
 interface PostSidebarProps {
   posts: Post[];
@@ -12,9 +13,9 @@ interface PostSidebarProps {
 export default function PostSidebar({ posts, postId, plan, course }: PostSidebarProps) {
   const sameType = posts.find((p) => p._id === postId)?.type || "Q";
   return (
-    <Card sx={{ height: "89vh", overflowY: "auto" }}>
+    <Card className="post-sidebar">
       <CardContent>
-        {sameType === "Q" ? <Typography variant="h6" sx={{ cursor: "default" }}>Más Preguntas Relacionadas</Typography> : <Typography variant="h6" sx={{ cursor:"default" }}>Más Sugerencias Relacionadas</Typography>}
+        <Typography>{sameType === "Q" ? "Más Preguntas Relacionadas" : "Más Sugerencias Relacionadas"}</Typography>
         <List>
           {posts
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

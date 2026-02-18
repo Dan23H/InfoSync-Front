@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import CourseSection from "./CourseSection";
 import { Typography, Grid } from "@mui/material";
+import "../../../../styles/student-posts.css";
 
 interface SearchResultsProps {
   posts: any[];
@@ -33,12 +34,12 @@ export default function SearchResults({ posts, query, currentUserId }: SearchRes
   }
 
   return (
-    <>
+    <div className="search-results" style={{ minWidth: '100vw', width: '100vw', boxSizing: 'border-box' }}>
       {groupEntries.map(([courseName, postsForCourse]) => (
-        <Grid key={courseName} size={{ xs: 12 }}>
+        <Grid key={courseName}>
           <CourseSection courseName={courseName} postsForCourse={postsForCourse} currentUserId={currentUserId} />
         </Grid>
       ))}
-    </>
+    </div>
   );
 }

@@ -1,8 +1,9 @@
+import "../../../../styles/student-courses.css";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 export default function SemesterSelect({ semesters, value, onChange }: any) {
   return (
-    <FormControl fullWidth>
+    <FormControl className="select-fullwidth">
       <InputLabel>Semestre</InputLabel>
       <Select value={value} label="Semestre" onChange={(e) => onChange(e.target.value)}>
         <MenuItem value="">Todos los semestres</MenuItem>

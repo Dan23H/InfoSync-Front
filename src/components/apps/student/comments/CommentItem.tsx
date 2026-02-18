@@ -1,3 +1,4 @@
+import "../../../../styles/student-comments.css";
 import { useState } from "react";
 import { Box, Typography, Avatar, TextField, Divider, IconButton, Button, Snackbar, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions, Tooltip } from "@mui/material";
 import { ReportSVG } from "../../../../assets";
@@ -48,10 +49,10 @@ export default function CommentItem({ comment, onAddSubComment }: CommentItemPro
     };
 
     return (
-        <Box sx={{ mb: 2, pl: 1 }}>
+        <Box className="comment-item">
             {/* Encabezado del comentario */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Avatar>{author ? author.userName[0] : loading ? "..." : "?"}</Avatar>
+            <Box style={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Avatar className="avatar">{author ? author.userName[0] : loading ? "..." : "?"}</Avatar>
                 <Typography variant="subtitle2">
                     {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
                 </Typography>

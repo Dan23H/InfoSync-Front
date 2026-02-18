@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Card, CardHeader, CardContent, Collapse, IconButton, Box, Button } from "@mui/material";
+import { Card, CardHeader, CardContent, Collapse, IconButton, Box, Button, Typography } from "@mui/material";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import PostCard from "./PostCard";
 
@@ -54,9 +54,9 @@ export default function CourseSection({ courseName, postsForCourse, currentUserI
   }, [sPosts, suggestionsSortMode, suggestionsDateDesc, suggestionsRecDesc]);
 
   return (
-    <Card sx={{ mb: 2 }}>
-  <CardHeader title={courseName} />
-  <CardContent>
+    <Card className="course-section-card">
+      <CardHeader title={courseName} />
+      <CardContent>
         {sortedQPosts.length > 0 && (
           <Card sx={{ mb: 1 }} elevation={0}>
             <CardHeader
@@ -79,11 +79,13 @@ export default function CourseSection({ courseName, postsForCourse, currentUserI
                   </Button>
 
                   <IconButton
+                    aria-label={questionsOpen ? "Ocultar preguntas" : "Mostrar preguntas"}
                     onClick={(e) => {
                       e.stopPropagation();
                       setQuestionsOpen((v) => !v);
                     }}
                   >
+                    <Typography variant="body2" sx={{ mr: 1 }}>{questionsOpen ? "Ocultar preguntas" : "Mostrar preguntas"}</Typography>
                     {questionsOpen ? <AiFillEyeInvisible /> : <AiFillEye />}
                   </IconButton>
                 </Box>

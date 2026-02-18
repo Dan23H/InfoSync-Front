@@ -1,3 +1,4 @@
+import "../../../../styles/student-modal.css";
 import { Box, Modal, IconButton } from "@mui/material";
 
 interface ImageModalProps {

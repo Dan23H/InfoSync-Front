@@ -11,16 +11,18 @@ import Navbar from '../../components/common/Navbar';
 export default function AdminMainPage() {
   const { value } = useTabs();
   return (
-    <Box>
-      <Navbar />
-      <ColorTabs />
-      <Box style={{ marginTop: "20px" }}>
-        {/*value === "stats" && <Stats/>*/}
-        {value == "plans" && <PlansViewer/>}
-        {/*value === "activity" && <RegActivity />*/}
-        {value === "modding" && <Modding/>}
-        {value === "users" && <Users/>}
+    <main role="main">
+      <Box>
+        <Navbar />
+        <ColorTabs />
+        <Box style={{ marginTop: "20px" }}>
+          {/*value === "stats" && <Stats/>*/}
+          {value == "plans" && <PlansViewer/>}
+          {/*value === "activity" && <RegActivity />*/}
+          {value === "modding" && <Modding/>}
+          {value === "users" && <Users/>}
+        </Box>
       </Box>
-    </Box>
+    </main>
   );
 }

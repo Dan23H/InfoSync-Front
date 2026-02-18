@@ -10,7 +10,9 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <PlanProvider>
         <PostModalProvider>
-          <AppRouter />
+          <main role="main">
+            <AppRouter />
+          </main>
         </PostModalProvider>
       </PlanProvider>
     </AuthProvider>

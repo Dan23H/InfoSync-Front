@@ -3,7 +3,7 @@ import CommentsSection from "../comments/CommentsSection";
 import type { Post } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useAuth } from "../../../../context";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { createReport, deletePost } from "../../../../api";
 import { useNavigate } from "react-router-dom";
 import ModalPost from "./ModalPost";
@@ -12,6 +12,7 @@ import LikeSelected from "../../../../assets/LikeSelected.svg";
 import DislikeSelected from "../../../../assets/DislikeSelected.svg"; // Importar correctamente los íconos como componentes o rutas
 import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
 import SocketContext from "../../../../context/SocketContext";
+import CopyUrlButton from "./CopyUrlButton";
 
 interface PostContentProps {
   post: Post;
@@ -27,9 +28,6 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [squareMounted, setSquareMounted] = useState(false);
-  const [squareVisible, setSquareVisible] = useState(false);
-  const hideTimerRef = useRef<number | null>(null);
   const [localLikeCount, setLocalLikeCount] = useState<number>(post.likeCount ?? 0);
   const [localDislikeCount, setLocalDislikeCount] = useState<number>(post.dislikeCount ?? 0);
   const { SocketDispatch, SocketState } = useContext(SocketContext);
@@ -167,31 +165,26 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   };
 
   return (
-    <Card sx={{ backgroundColor: "#D9D9D9", p: 2 }}>
+    <Card className="post-content-card">
       <CardContent>
         {/* Header */}
-        <Box sx={{
-          display: "flex",
-          alignItems: "center",
-          mb: 2,
-          justifyContent: "space-between"
-        }}>
+        <Box className="post-content-header">
           {/* Izquierda: avatar, usuario, fecha */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Avatar sx={{ bgcolor: "brown" }} />
-            <Typography variant="body2" fontWeight="bold">
+          <Box style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Avatar className="avatar" />
+            <Typography variant="body2" className="author">
               {author ? author.userName : loading ? "Cargando..." : "Desconocido"}
             </Typography>
-            <Typography variant="body2" sx={{ ml: 1 }}>
+            <Typography variant="body2" className="date">
               {new Date(post.createdAt).toLocaleDateString()}
             </Typography>
           </Box>
           {/* Derecha: tipo y menú */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <Chip
               label={post.type === "Q" ? "Pregunta" : "Sugerencia"}
               size="small"
-              sx={{ bgcolor: post.type === "Q" ? "#787777" : "#006387", color: "#fff" }}
+              style={{ backgroundColor: post.type === "Q" ? "#787777" : "#006387", color: "#fff" }}
             />
             <IconButton
               onClick={(e) => {
@@ -345,71 +338,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-              {squareMounted && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "100%",
-                    transform: squareVisible ? "translate(0, -50%)" : "translate(5px, -50%)",
-                    width: 20,
-                    height: 20,
-                    border: "2px solid green",
-                    borderRadius: 1,
-                    backgroundColor: "transparent",
-                    transition: "transform 300ms cubic-bezier(.42,0,.58,1), opacity 300ms",
-                    opacity: squareVisible ? 1 : 0,
-                    pointerEvents: "none",
-                    boxSizing: "border-box",
-                    zIndex: 10,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'green',
-                    fontSize: '1rem',
-                    lineHeight: 1,
-                  }}
-                >
-                  <span aria-hidden="true">✔</span>
-                </Box>
-              )}
-
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: "red",
-                  borderColor: "red",
-                  backgroundColor: "transparent",
-                  ":hover": {
-                    backgroundColor: "rgba(255, 0, 0, 0.1)",
-                    borderColor: "darkred",
-                  },
-                }}
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-
-                  // reset previous timer
-                  if (hideTimerRef.current) {
-                    window.clearTimeout(hideTimerRef.current);
-                    hideTimerRef.current = null;
-                  }
-                  if (!squareMounted) {
-                    setSquareMounted(true);
-                    requestAnimationFrame(() => setSquareVisible(true));
-                  } else {
-                    setSquareVisible(true);
-                  }
-
-                  hideTimerRef.current = window.setTimeout(() => {
-                    setSquareVisible(false);
-                    window.setTimeout(() => setSquareMounted(false), 300);
-                    hideTimerRef.current = null;
-                  }, 5000);
-                }}
-              >
-                Copiar URL
-              </Button>
+              <CopyUrlButton to={window.location.href} />
             </Box>
             
           </Box>

@@ -1,3 +1,4 @@
+import "../../../../styles/student-modal.css";
 import { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControlLabel, Grid, Radio, Autocomplete, RadioGroup, Typography, FormControl, FormHelperText, Divider } from "@mui/material";
 import { useAuth } from "../../../../context/AuthContext";

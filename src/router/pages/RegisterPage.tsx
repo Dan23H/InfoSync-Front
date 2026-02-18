@@ -49,7 +49,7 @@ export default function RegisterPage() {
     const togglePasswordConfirmVisibility = () => setShowPasswordConfirm((prev) => !prev);
 
     return (
-        <>
+        <main role="main">
             <Box
                 sx={{
                     position: "fixed",
@@ -204,6 +204,6 @@ export default function RegisterPage() {
                     </Paper>
                 </motion.div>
             </Box>
-        </>
+        </main>
     );
 }
