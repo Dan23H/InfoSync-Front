@@ -146,11 +146,13 @@ export default function CourseSection({ courseName, postsForCourse, currentUserI
                   </Button>
 
                   <IconButton
+                    aria-label={suggestionsOpen ? "Ocultar sugerencias" : "Mostrar sugerencias"}
                     onClick={(e) => {
                       e.stopPropagation();
                       setSuggestionsOpen((v) => !v);
                     }}
                   >
+                    <Typography variant="body2" sx={{ mr: 1 }}>{suggestionsOpen ? "Ocultar sugerencias" : "Mostrar sugerencias"}</Typography>
                     {suggestionsOpen ? <AiFillEyeInvisible /> : <AiFillEye />}
                   </IconButton>
                 </Box>
