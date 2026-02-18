@@ -1,3 +1,13 @@
+/* Chip styles for posts */
+.chip-question {
+  background-color: #252525 !important;
+  color: #fff !important;
+}
+
+.chip-suggestion {
+  background-color: #006387 !important;
+  color: #fff !important;
+}
 /* Styles for student posts section */
 
 .post-card {

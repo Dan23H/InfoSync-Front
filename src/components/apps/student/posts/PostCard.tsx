@@ -116,7 +116,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               <Chip
                 label={post.type === "Q" ? "Pregunta" : "Sugerencia"}
                 size="small"
-                style={{ backgroundColor: post.type === "Q" ? "#252525" : "#006387", color: "#fff" }}
+                className={post.type === "Q" ? "chip-question" : "chip-suggestion"}
               />
               <IconButton
                 onClick={(e) => {
