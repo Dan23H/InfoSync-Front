@@ -104,56 +104,55 @@ export default function Navbar() {
               </Button>
               {isStudentView && (
                 <>
-                  <Button color="inherit" onClick={() => navigate("/student")}>
-                    {courseName ? `${pensum?.name} - ${courseName}` : "Home"}
+                  <Typography noWrap sx={{cursor:"default"}}>
+                    {pensum?.name}
+                  </Typography>
+                  <Button color="inherit" onClick={handleHomeClick}>
+                    <Typography>{courseName ? `${courseName}` : "Ingeniería Informática"}</Typography>
                   </Button>
-                  {!isProfileRoute && (
-                    <Button color="inherit" onClick={handleNewPost}>
-                      <Typography>Crear publicación</Typography>
-                    </Button>
-                  )}
                 </>
               )}
             </>
           ) : (
             <>
               <Button color="inherit" onClick={handleHomeClick}>
-                {courseName ? `${courseName}` : "Ingeniería Informática"}
+                <Typography>{courseName ? `${courseName}` : "Ingeniería Informática"}</Typography>
               </Button>
+            </>
+          )}
+          {/* Search box - show on any student route so users can search within the current plan */}
+          {location.pathname.startsWith("/student") && (
+            <>
               {!isProfileRoute && (
                 <Button color="inherit" onClick={handleNewPost}>
                   <Typography>Crear publicación</Typography>
                 </Button>
               )}
+              <TextField
+                className="navbar-search"
+                size="small"
+                placeholder="Buscar posts..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(search);
+                  }
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        onClick={() => handleSearch(search)}
+                      >
+                        Buscar
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ ml: 2, width: 260 }}
+              />
             </>
-          )}
-          {/* Search box - show on any student route so users can search within the current plan */}
-          {location.pathname.startsWith("/student") && (
-
-            <TextField
-              className="navbar-search"
-              size="small"
-              placeholder="Buscar posts..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch(search);
-                }
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button
-                      onClick={() => handleSearch(search)}
-                    >
-                      Buscar
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ ml: 2, width: 260 }}
-            />
           )}
         </Box>
 
@@ -201,5 +200,6 @@ export default function Navbar() {
         </Menu>
       </Toolbar>
     </AppBar>
+
   );
 }

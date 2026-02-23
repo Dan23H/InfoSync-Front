@@ -4,15 +4,15 @@ import type { Post } from "../../../../models";
 import { useAuthor } from "../../../../hooks/useAuthor";
 import { useAuth } from "../../../../context";
 import { useState, useEffect, useContext } from "react";
-import { createReport, deletePost } from "../../../../api";
+import { createReport, deletePost, updateDislike, updateLike, updatePost, getPostById } from "../../../../api";
 import { useNavigate } from "react-router-dom";
 import ModalPost from "./ModalPost";
-import { updateDislike, updateLike, updatePost } from "../../../../api/post";
 import LikeSelected from "../../../../assets/LikeSelected.svg";
 import DislikeSelected from "../../../../assets/DislikeSelected.svg"; // Importar correctamente los íconos como componentes o rutas
 import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
 import SocketContext from "../../../../context/SocketContext";
 import CopyUrlButton from "./CopyUrlButton";
+import { usePostsUpdate } from "../../../../context/PostsUpdateContext";
 
 interface PostContentProps {
   post: Post;
@@ -28,6 +28,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [localPost, setLocalPost] = useState<Post>(post);
   const [localLikeCount, setLocalLikeCount] = useState<number>(post.likeCount ?? 0);
   const [localDislikeCount, setLocalDislikeCount] = useState<number>(post.dislikeCount ?? 0);
   const { SocketDispatch, SocketState } = useContext(SocketContext);
@@ -35,14 +36,16 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   const urlActual = window.location.pathname;
   const urlVolver = urlActual.substring(0, urlActual.lastIndexOf('/'));
   const navigate = useNavigate();
+  const { notifyUpdate } = usePostsUpdate();
 
   // WSS URL comes from global socket in context; no local socket creation here.
 
   // Sync local counters when post updates from props (e.g., via sockets)
   useEffect(() => {
+    setLocalPost(post);
     setLocalLikeCount(post.likeCount ?? 0);
     setLocalDislikeCount(post.dislikeCount ?? 0);
-  }, [post.likeCount, post.dislikeCount]);
+  }, [post]);
 
   // Use the global socket from SocketContext. Join the post room when the global socket is available.
   useEffect(() => {
@@ -95,7 +98,7 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   ];
 
   const score = useWilsonScore(localLikeCount, localDislikeCount);
-  const totalVotes = (post.likeCount ?? 0) + (post.dislikeCount ?? 0);
+  const totalVotes = localLikeCount + localDislikeCount;
   const recommendation = getRecommendationLabel(score, totalVotes);
   const recommendationLabel = recommendation.label;
   const recommendationColor = recommendation.color;
@@ -117,30 +120,27 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
   };
 
   const handleDeletePost = async () => {
-    await deletePost(post._id, user._id);
+    await deletePost(post._id);
     setDeleteDialogOpen(false);
     navigate(urlVolver)
   };
 
   const handleLike = async () => {
-    // Ensure global socket exists
     const socket = SocketState.socket;
     if (!socket) {
       console.warn('No global socket available for like');
       return;
     }
-
-    const newLikeCount = localLikeCount + 1;
-    setLocalLikeCount(newLikeCount);
-
     try {
-      // Update backend (persistent) then notify via socket through the reducer
-      await updateLike(post._id);
-      console.log("Dispatching like_update via SocketDispatch for post:", post._id, newLikeCount);
-      SocketDispatch({ type: 'like_update', payload: { postId: post._id, likeCount: newLikeCount } });
+      await updateLike(localPost._id);
+      const updated = await getPostById(localPost._id);
+      setLocalPost(updated);
+      setLocalLikeCount(updated.likeCount ?? 0);
+      setLocalDislikeCount(updated.dislikeCount ?? 0);
+      SocketDispatch({ type: 'like_update', payload: { postId: localPost._id, likeCount: updated.likeCount } });
+      notifyUpdate(); // Notifica el contexto para refrescar el sidebar
     } catch (error) {
       console.error("Error updating like count:", error);
-      setLocalLikeCount((prev) => prev - 1); // Revert on error
     }
   };
 
@@ -150,17 +150,16 @@ export default function PostContent({ post, onImageClick }: PostContentProps) {
       console.warn('No global socket available for dislike');
       return;
     }
-
-    const newDislikeCount = localDislikeCount + 1;
-    setLocalDislikeCount(newDislikeCount);
-
     try {
-      await updateDislike(post._id);
-      console.log("Dispatching dislike_update via SocketDispatch for post:", post._id, newDislikeCount);
-      SocketDispatch({ type: 'dislike_update', payload: { postId: post._id, dislikeCount: newDislikeCount } });
+      await updateDislike(localPost._id);
+      const updated = await getPostById(localPost._id);
+      setLocalPost(updated);
+      setLocalLikeCount(updated.likeCount ?? 0);
+      setLocalDislikeCount(updated.dislikeCount ?? 0);
+      SocketDispatch({ type: 'dislike_update', payload: { postId: localPost._id, dislikeCount: updated.dislikeCount } });
+      notifyUpdate(); // Notifica el contexto para refrescar el sidebar
     } catch (error) {
       console.error("Error updating dislike count:", error);
-      setLocalDislikeCount((prev) => prev - 1);
     }
   };
 

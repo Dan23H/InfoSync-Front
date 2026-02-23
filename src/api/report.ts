@@ -20,5 +20,5 @@ export const resolveReport = (id: string, data: { userId: string, state: string,
         body: JSON.stringify(data)
     });
 
-export const deleteReport = (id: string, userId: string) =>
-    request<void>(`${BASE_URL}/report/${id}`, { method: "DELETE", body: JSON.stringify({ userId }) });
+export const deleteReport = (id: string) =>
+    request<void>(`${BASE_URL}/report/${id}`, { method: "DELETE"});

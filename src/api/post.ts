@@ -57,8 +57,5 @@ export const updateDislike = (id: string) => {
   return request<Post>(url, { method: "POST" });
 }
 
-export const deletePost = (postId: string, userId: string) =>
-  request<void>(`${BASE_URL}/post/${postId}`, {
-    method: "DELETE",
-    body: JSON.stringify({ userId }),
-  });
+export const deletePost = (postId: string) =>
+  request<void>(`${BASE_URL}/post/${postId}`, { method: "DELETE" });

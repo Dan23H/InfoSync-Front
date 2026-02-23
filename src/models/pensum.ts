@@ -23,6 +23,7 @@ export interface Pensum {
 
 export interface PensumDto {
   name: string;
+  description?: string;
   totalSemesters: number;
   semesters: SemesterDto[];
 }

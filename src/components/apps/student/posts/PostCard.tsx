@@ -1,5 +1,6 @@
 import { Box, Typography, IconButton, Chip, Menu, MenuItem, Card, CardContent, CardActions, Avatar, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, Select, Divider } from "@mui/material";
 import { useState } from "react";
+import { usePostsUpdate } from "../../../../context/PostsUpdateContext";
 import type { Post } from "../../../../models";
 import { Link } from "react-router-dom";
 import { slugify } from "../../../../utils/slugify";
@@ -7,6 +8,7 @@ import { AddBookmarkSVG, BookmarkSVG, DislikeSelected, DislikeUnselected, LikeSe
 import { useCommentsCount } from "../../../../hooks/useCounter";
 import { createReport, deletePost, updatePost } from "../../../../api";
 import { useAuthor } from "../../../../hooks/useAuthor";
+import { updateLike, updateDislike } from "../../../../api";
 import ModalPost from "./ModalPost";
 import { useWilsonScore, getRecommendationLabel } from "../../../../hooks/useWilsonScore";
 import CopyUrlButton from "./CopyUrlButton";
@@ -17,6 +19,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, currentUserId }: PostCardProps) {
+  const { notifyUpdate } = usePostsUpdate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
@@ -73,8 +76,9 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
   const handleDeletePost = async () => {
     try {
-      await deletePost(post._id, currentUserId || "");
+      await deletePost(post._id);
       setDeleteDialogOpen(false);
+      notifyUpdate();
     } catch (err) {
       console.error("Error al borrar el post", err);
     }
@@ -191,21 +195,33 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             {post.type === "S" && (
               <Box sx={{ display: "flex", gap: 1 }}>
                 <IconButton
-                  onClick={() => {
-                    setLiked(!liked);
-                    if (disliked) setDisliked(false);
-                  }}
-                >
-                  {liked ? <img src={LikeSelected} alt="like" width={22} height={22} /> : <img src={LikeUnselected} alt="like" width={22} height={22} />}
-                </IconButton>
-                <IconButton
-                  onClick={() => {
-                    setDisliked(!disliked);
-                    if (liked) setLiked(false);
-                  }}
-                >
-                  {disliked ? <img src={DislikeSelected} alt="dislike" width={22} height={22} /> : <img src={DislikeUnselected} alt="dislike" width={22} height={22} />}
-                </IconButton>
+                    onClick={async () => {
+                      try {
+                        await updateLike(post._id);
+                        setLiked(true);
+                        setDisliked(false);
+                        notifyUpdate();
+                      } catch (err) {
+                        console.error("Error al dar like", err);
+                      }
+                    }}
+                  >
+                    {liked ? <img src={LikeSelected} alt="like" width={22} height={22} /> : <img src={LikeUnselected} alt="like" width={22} height={22} />}
+                  </IconButton>
+                  <IconButton
+                    onClick={async () => {
+                      try {
+                        await updateDislike(post._id);
+                        setDisliked(true);
+                        setLiked(false);
+                        notifyUpdate();
+                      } catch (err) {
+                        console.error("Error al dar dislike", err);
+                      }
+                    }}
+                  >
+                    {disliked ? <img src={DislikeSelected} alt="dislike" width={22} height={22} /> : <img src={DislikeUnselected} alt="dislike" width={22} height={22} />}
+                  </IconButton>
               </Box>
             )}
             <IconButton

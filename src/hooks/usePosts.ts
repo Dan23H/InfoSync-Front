@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { usePostsUpdate } from "../context/PostsUpdateContext";
 import { getPosts, createPost } from "../api";
 import type { Post, PostDto } from "../models";
 import { slugify } from "../utils/slugify";
 import { useAuth } from "../context/AuthContext";
 
 export function usePosts(plan?: string, course?: string) {
+  const { updated } = usePostsUpdate();
   const [data, setData] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,8 @@ export function usePosts(plan?: string, course?: string) {
 
   useEffect(() => {
     fetchPosts();
-  }, [plan, course]);
+    // eslint-disable-next-line
+  }, [plan, course, updated]);
 
   return { data, loading, error, addPost, fetchPosts };
 }

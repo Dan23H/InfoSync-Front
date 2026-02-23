@@ -18,11 +18,8 @@ export const updateComment = (id: string, data: { commentary: string }) =>
     body: JSON.stringify(data),
   });
 
-export const deleteComment = (commentId: string, userId: string) =>
-  request<void>(`${BASE_URL}/comment/${commentId}`, {
-    method: "DELETE",
-    body: JSON.stringify({ userId }),
-  });
+export const deleteComment = (commentId: string) =>
+  request<void>(`${BASE_URL}/comment/${commentId}`, { method: "DELETE" });
 
 export const createSubComment = (commentId: string, data: { userId: string; commentary: string }) =>
   request<Comment>(`${BASE_URL}/comment/${commentId}/subcomment`, {
@@ -30,11 +27,8 @@ export const createSubComment = (commentId: string, data: { userId: string; comm
     body: JSON.stringify(data),
   });
 
-export const deleteSubComment = (commentId: string, subCommentId: string, userId: string) =>
-  request<void>(`${BASE_URL}/comment/${commentId}/subcomment/${subCommentId}`, {
-    method: "DELETE",
-    body: JSON.stringify({ userId }),
-  });
+export const deleteSubComment = (commentId: string, subCommentId: string) =>
+  request<void>(`${BASE_URL}/comment/${commentId}/subcomment/${subCommentId}`, { method: "DELETE" });
 
 export const getCommentById = (id: string) =>
   request<Comment>(`${BASE_URL}/comment/${id}`, { method: "GET" });
