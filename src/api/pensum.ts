@@ -22,7 +22,9 @@ export const updatePensum = (id: string, data: PensumDto) =>
     });
 
 export const deletePensum = (id: string) =>
-    request<void>(`${BASE_URL}/pensum/${id}`, { method: "DELETE" });
+    request<void>(`${BASE_URL}/pensum/${id}`, { 
+        method: "DELETE"
+    });
 
 export const addCourse = (id: string, data: { semesterNumber: number; courseName: string; courseType: CourseType }) =>
     request<Pensum>(`${BASE_URL}/pensum/${id}/course`, {

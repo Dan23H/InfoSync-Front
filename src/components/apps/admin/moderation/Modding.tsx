@@ -129,25 +129,25 @@ export default function Modding() {
       // Now perform deletion/moderation actions (if requested) using admin id
       if (moderation.deleteContent && modalContent) {
         if (modalReport.targetType === "post") {
-          await deletePost(modalContent._id, currentUserId);
+          await deletePost(modalContent._id);
           const comments = await getComments(modalContent._id);
           for (const comment of comments) {
             if (comment.subComments && comment.subComments.length > 0) {
               for (const sub of comment.subComments) {
-                await deleteSubComment(comment._id, sub._id, currentUserId);
+                await deleteSubComment(comment._id, sub._id);
               }
             }
-            await deleteComment(comment._id, currentUserId);
+            await deleteComment(comment._id);
           }
         } else if (modalReport.targetType === "comment") {
           if (modalContent.subComments && modalContent.subComments.length > 0) {
             for (const sub of modalContent.subComments) {
-              await deleteSubComment(modalContent._id, sub._id, currentUserId);
+              await deleteSubComment(modalContent._id, sub._id);
             }
           }
-          await deleteComment(modalContent._id, currentUserId);
+          await deleteComment(modalContent._id);
         } else if (modalReport.targetType === "subcomment") {
-          await deleteSubComment(modalContent.commentId, modalContent._id, currentUserId);
+          await deleteSubComment(modalContent.commentId, modalContent._id);
         }
       }
       if (moderation.banUser && modalContent?.userId) {
@@ -188,8 +188,7 @@ export default function Modding() {
         alert("No autorizado. Inicia sesión de nuevo.");
         return;
       }
-      const currentUserId = user.userId || user._id;
-      await deleteReport(reportId, currentUserId);
+      await deleteReport(reportId);
       setReports(reports => reports.filter(r => r._id !== reportId));
       alert("Reporte borrado correctamente.");
     } catch (err) {
