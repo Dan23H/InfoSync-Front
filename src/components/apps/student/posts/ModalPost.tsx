@@ -28,11 +28,17 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     const { user } = useAuth();
     const { planId } = usePlan();
 
+    const allowedFileExts = [
+        "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "odt", "ods", "odp", "rtf", "zip", "rar", "7z"
+    ];
+    const allowedImageExts = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+
     const initialForm = {
         title: initialData?.title || "",
         subject: initialData?.subject || "",
-    // Do not default to the first course: require explicit selection
-    course: initialData?.course || "",
+        // Do not default to the first course: require explicit selection
+        course: initialData?.course || "",
         type: (initialData?.type as "Q" | "S") || "Q", // default válido
         description: initialData?.description || "",
         images: [] as File[],
@@ -51,12 +57,41 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
     };
 
     const handleFileChange = (field: "images" | "files", files: FileList | null) => {
-        if (files) {
-            setForm((prev) => ({
-                ...prev,
-                [field]: [...prev[field], ...Array.from(files)],
-            }));
+        if (!files) return;
+        let validFiles: File[] = [];
+        let errorMsg = "";
+        Array.from(files).forEach(file => {
+            const ext = file.name.split(".").pop()?.toLowerCase() || "";
+            if (file.size >= maxFileSize) {
+                errorMsg = `El archivo '${file.name}' supera el límite de 10MB.`;
+                return;
+            }
+            if (field === "images") {
+                if (!allowedImageExts.includes(ext)) {
+                    errorMsg = `La imagen '${file.name}' no tiene un formato permitido.`;
+                    return;
+                }
+            } else {
+                if (!allowedFileExts.includes(ext)) {
+                    errorMsg = `El archivo '${file.name}' no tiene un formato permitido.`;
+                    return;
+                }
+            }
+            validFiles.push(file);
+        });
+        if (errorMsg) {
+            setErrors(prev => ({ ...prev, [field]: errorMsg }));
+            return;
         }
+        setErrors(prev => {
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
+        setForm((prev) => ({
+            ...prev,
+            [field]: [...prev[field], ...validFiles],
+        }));
     };
 
     // When the course input loses focus, if the user typed something but didn't pick an
@@ -260,6 +295,9 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                     onChange={(e) => handleFileChange("images", e.target.files)}
                                 />
                             </Button>
+                            {errors.images && (
+                                <Box sx={{ color: 'red', fontSize: '0.9rem', mt: 1 }}>{errors.images}</Box>
+                            )}
                             <Box sx={{ mt: 1, maxHeight: 120, overflowY: "auto" }}>
                                 {form.images ? <Typography variant="subtitle2">Subiendo {form.images.length} imágenes:</Typography> : null}
                                 {form.images.map((file, index) => (
@@ -309,7 +347,13 @@ export default function ModalPost({ open, onClose, onSubmit, courses, initialDat
                                     onChange={(e) => handleFileChange("files", e.target.files)}
                                 />
                             </Button>
+                            {errors.files && (
+                                <Box sx={{ color: 'red', fontSize: '0.9rem', mt: 1 }}>{errors.files}</Box>
+                            )}
                             <Box sx={{ mt: 1, maxHeight: 120, overflowY: "auto" }}>
+                                {form.files.length > 0 ? (
+                                    <Typography variant="subtitle2">Subiendo {form.files.length} archivos:</Typography>
+                                ) : null}
                                 {form.files.map((file, index) => (
                                     <Box
                                         key={index}
