@@ -1,21 +1,25 @@
-# Ejecutando el proyecto
-Si deseas ejecutar el frontend de forma local para desarrollo, debes colocar en la consola del editor preferido o
-en la ubicación del proyecto lo siguiente:
+## Project Setup
+```
+# Install dependencies
+$ npm install
+```
+
+## Compile and run the project
 
 ```
+# development
 npm run dev
-```
 
-Si por el contrario deseas utilizarlo en producción, recomendamos usar:
-
-```
+# production
 npm run build
 ```
 
-Ten en cuenta que antes de ejecutarlo en producción debes crear/modificar el archivo de entorno siguiendo la 
-estructura:
-
+Before running on production you must create/modify the environment file following this structure:
 ```env
 # .env.template
-VITE_BACK_API = "https://url-backend-here"
+VITE_API_URL = "https://url-backend-here"
+VITE_WSS-API_URL = "wss://url-backend-here"
 ```
+
+And... that's all! This is just the front-end. If you want to see the back-end documentation visit this one: 
+https://github.com/JJSaavedra52/InfoSyncBackend
